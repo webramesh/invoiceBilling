@@ -15,12 +15,16 @@ class Subscription extends Model
         'price',
         'status',
         'auto_renewal',
+        'whatsapp_notifications',
+        'email_notifications',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'next_billing_date' => 'date',
         'auto_renewal' => 'boolean',
+        'whatsapp_notifications' => 'boolean',
+        'email_notifications' => 'boolean',
     ];
 
     public function client()

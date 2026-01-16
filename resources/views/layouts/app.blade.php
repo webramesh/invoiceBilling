@@ -44,7 +44,7 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .active-nav {
+        .sidebar-item-active {
             background-color: rgba(255, 255, 255, 0.15);
             border-left: 4px solid white;
             color: white !important;
@@ -85,7 +85,8 @@
                             </div>
                             <div class="text-left hidden lg:block pr-2">
                                 <p class="text-xs font-bold text-[#121617] dark:text-white leading-tight">
-                                    {{ Auth::user()->name }}</p>
+                                    {{ Auth::user()->name }}
+                                </p>
                                 <p class="text-[10px] font-medium text-gray-500 dark:text-gray-400">Super Admin</p>
                             </div>
                             <span
@@ -106,7 +107,8 @@
                             <div class="p-4 border-b border-gray-50 dark:border-slate-800">
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Account</p>
                                 <p class="text-sm font-bold text-[#121617] dark:text-white truncate">
-                                    {{ Auth::user()->email }}</p>
+                                    {{ Auth::user()->email }}
+                                </p>
                             </div>
 
                             <div class="py-2">

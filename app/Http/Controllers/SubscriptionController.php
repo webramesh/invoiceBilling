@@ -84,6 +84,8 @@ class SubscriptionController extends Controller
             $validated['next_billing_date'] = $startDate->copy()->addMonths($billingCycle->months);
             $validated['status'] = 'active';
             $validated['auto_renewal'] = $request->has('auto_renewal');
+            $validated['whatsapp_notifications'] = $request->has('whatsapp_notifications');
+            $validated['email_notifications'] = $request->has('email_notifications');
 
             Subscription::create($validated);
 
@@ -132,6 +134,8 @@ class SubscriptionController extends Controller
         ]);
 
         $validated['auto_renewal'] = $request->has('auto_renewal');
+        $validated['whatsapp_notifications'] = $request->has('whatsapp_notifications');
+        $validated['email_notifications'] = $request->has('email_notifications');
         $subscription->update($validated);
 
         return redirect()->route('subscriptions.index')->with('success', 'Subscription updated successfully.');
