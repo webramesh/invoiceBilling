@@ -14,10 +14,35 @@ class SubscriptionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subscriptions = Subscription::with(['client', 'service', 'billingCycle'])->latest()->paginate(10);
-        return view('subscriptions.index', compact('subscriptions'));
+        $query = Subscription::with(['client', 'service', 'billingCycle']);
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->whereHas('client', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            })->orWhereHas('service', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('cycle')) {
+            $query->whereHas('billingCycle', function ($q) use ($request) {
+                $q->where('name', $request->input('cycle'));
+            });
+        }
+
+        $subscriptions = $query->latest()->paginate(10)->withQueryString();
+
+        $stats = [
+            'total_mrr' => Subscription::where('status', 'active')->sum('price'),
+            'renewals_this_month' => Subscription::whereMonth('next_billing_date', now()->month)->count(),
+            'active_services_count' => Subscription::where('status', 'active')->count(),
+            'unique_clients_count' => Subscription::distinct('client_id')->count(),
+        ];
+
+        return view('subscriptions.index', compact('subscriptions', 'stats'));
     }
 
     /**
