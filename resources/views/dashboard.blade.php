@@ -1,6 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        Dashboard Overview
+        <div>
+            <h2 class="text-3xl font-black text-[#121617] dark:text-white tracking-tight leading-none">Dashboard</h2>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mt-2 font-medium">Infrastructure overview and business
+                performance</p>
+        </div>
     </x-slot>
 
     <!-- Stats Grid -->
@@ -9,7 +13,8 @@
             <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Total Clients</p>
             <div class="flex items-end justify-between mt-2">
                 <p class="text-2xl font-extrabold text-primary dark:text-white">
-                    {{ number_format($stats['total_clients']) }}</p>
+                    {{ number_format($stats['total_clients']) }}
+                </p>
                 <span class="text-accent-emerald text-xs font-bold flex items-center">Active</span>
             </div>
         </div>
@@ -26,7 +31,8 @@
             <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Revenue (Month)</p>
             <div class="flex items-end justify-between mt-2">
                 <p class="text-2xl font-extrabold text-primary dark:text-white">Rs.
-                    {{ number_format($stats['revenue_month'], 2) }}</p>
+                    {{ number_format($stats['revenue_month'], 2) }}
+                </p>
                 <span class="text-accent-emerald text-xs font-bold flex items-center">Collected</span>
             </div>
         </div>
@@ -98,7 +104,8 @@
                                         </div>
                                         <div>
                                             <p class="text-sm font-semibold text-primary dark:text-white">
-                                                {{ $sub->service->name }}</p>
+                                                {{ $sub->service->name }}
+                                            </p>
                                             <p class="text-[10px] text-slate-500">{{ $sub->client->name }}</p>
                                         </div>
                                     </div>
@@ -158,7 +165,8 @@
                                 <td class="px-6 py-4">
                                     <div>
                                         <p class="text-sm font-semibold text-primary dark:text-white">
-                                            {{ $invoice->invoice_number }}</p>
+                                            {{ $invoice->invoice_number }}
+                                        </p>
                                         <p class="text-[10px] text-slate-500">{{ $invoice->client->name }}</p>
                                     </div>
                                 </td>

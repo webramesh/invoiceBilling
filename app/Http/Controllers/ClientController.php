@@ -28,9 +28,19 @@ class ClientController extends Controller
             $query->where('status', $request->input('status'));
         }
 
-        $clients = $query->latest()->paginate(10)->withQueryString();
+        $clients = $query->withCount([
+            'subscriptions' => function ($q) {
+                $q->where('status', 'active');
+            }
+        ])->withSum('invoices', 'total')->latest()->paginate(10)->withQueryString();
 
-        return view('clients.index', compact('clients'));
+        $stats = [
+            'total_active' => Client::where('status', 'active')->count(),
+            'new_this_month' => Client::whereMonth('created_at', now()->month)->count(),
+            'retention_rate' => 98.2, // Mocked for UI demonstration
+        ];
+
+        return view('clients.index', compact('clients', 'stats'));
     }
 
     /**
