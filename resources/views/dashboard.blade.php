@@ -1,155 +1,241 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
+        Dashboard Overview
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- Revenue Month -->
-                <div
-                    class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-indigo-500">
-                    <div class="p-6">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                            {{ __('Revenue (This Month)') }}</p>
-                        <p class="text-2xl font-black text-gray-900 dark:text-white mt-1">Rs.
-                            {{ number_format($stats['revenue_month'], 2) }}</p>
-                    </div>
-                </div>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Total Clients</p>
+            <div class="flex items-end justify-between mt-2">
+                <p class="text-2xl font-extrabold text-primary dark:text-white">
+                    {{ number_format($stats['total_clients']) }}</p>
+                <span class="text-accent-emerald text-xs font-bold flex items-center">Active</span>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Active
+                Subscriptions</p>
+            <div class="flex items-end justify-between mt-2">
+                <p class="text-2xl font-extrabold text-accent-teal">{{ number_format($stats['active_subscriptions']) }}
+                </p>
+                <span class="text-accent-emerald text-xs font-bold flex items-center">Live</span>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Revenue (Month)</p>
+            <div class="flex items-end justify-between mt-2">
+                <p class="text-2xl font-extrabold text-primary dark:text-white">Rs.
+                    {{ number_format($stats['revenue_month'], 2) }}</p>
+                <span class="text-accent-emerald text-xs font-bold flex items-center">Collected</span>
+            </div>
+        </div>
+        <div class="bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/50 p-6 rounded-xl border shadow-sm">
+            <p class="text-accent-red text-xs font-bold uppercase tracking-wider">Overdue Invoices</p>
+            <div class="flex items-end justify-between mt-2">
+                <p class="text-2xl font-extrabold text-accent-red">{{ $stats['overdue_invoices'] }}</p>
+                <span class="bg-accent-red text-white text-[10px] px-2 py-0.5 rounded-full font-bold">URGENT</span>
+            </div>
+        </div>
+    </div>
 
-                <!-- Overdue Invoices -->
+    <!-- Filters & Sync Row -->
+    <div
+        class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm mb-8">
+        <div class="flex items-center gap-4">
+            <span class="text-sm font-bold text-primary dark:text-slate-300">Quick Stats:</span>
+            <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                 <div
-                    class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-red-500">
-                    <div class="p-6">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                            {{ __('Overdue Invoices') }}</p>
-                        <p class="text-2xl font-black text-gray-900 dark:text-white mt-1">
-                            {{ $stats['overdue_invoices'] }}</p>
-                    </div>
-                </div>
-
-                <!-- Active Subscriptions -->
-                <div
-                    class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-green-500">
-                    <div class="p-6">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                            {{ __('Active Services') }}</p>
-                        <p class="text-2xl font-black text-gray-900 dark:text-white mt-1">
-                            {{ $stats['active_subscriptions'] }}</p>
-                    </div>
-                </div>
-
-                <!-- Total Clients -->
-                <div
-                    class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-blue-500">
-                    <div class="p-6">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                            {{ __('Total Clients') }}</p>
-                        <p class="text-2xl font-black text-gray-900 dark:text-white mt-1">{{ $stats['total_clients'] }}
-                        </p>
-                    </div>
+                    class="px-4 py-1.5 bg-white dark:bg-slate-700 shadow-sm rounded-md text-accent-teal dark:text-white text-xs font-bold">
+                    Yearly: Rs. {{ number_format($stats['revenue_year'], 2) }}
                 </div>
             </div>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+            <a href="{{ route('subscriptions.create') }}"
+                class="flex-1 sm:flex-none bg-primary hover:bg-primary-light text-white text-xs font-bold py-2.5 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg shadow-primary/20">
+                <span class="material-symbols-outlined text-sm">add</span> New Subscription
+            </a>
+        </div>
+    </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Upcoming Renewals -->
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-widest">
-                            {{ __('Upcoming Renewals (Next 30 Days)') }}</h3>
-                    </div>
-                    <div class="p-6">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full">
-                                <thead>
-                                    <tr
-                                        class="text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                                        <th class="pb-3">{{ __('Client') }}</th>
-                                        <th class="pb-3">{{ __('Service') }}</th>
-                                        <th class="pb-3">{{ __('Date') }}</th>
-                                        <th class="pb-3 text-right">{{ __('Price') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-sm">
-                                    @forelse($upcomingRenewals as $renewal)
-                                        <tr class="border-t border-gray-100 dark:border-gray-700">
-                                            <td class="py-4">
-                                                <a href="{{ route('clients.show', $renewal->client) }}"
-                                                    class="font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
-                                                    {{ $renewal->client->name }}
-                                                </a>
-                                            </td>
-                                            <td class="py-4 text-gray-600 dark:text-gray-300">{{ $renewal->service->name }}
-                                            </td>
-                                            <td class="py-4">{{ $renewal->next_billing_date->format('M d, Y') }}</td>
-                                            <td class="py-4 text-right font-bold">{{ number_format($renewal->price, 2) }}
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="py-4 text-center text-gray-500">
-                                                {{ __('No upcoming renewals.') }}</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+    <!-- Tables Row -->
+    <div class="grid grid-cols-12 gap-6 mb-8">
+        <!-- Upcoming Renewals -->
+        <div
+            class="col-span-12 xl:col-span-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div
+                class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-teal font-bold">event_upcoming</span>
+                    <h3 class="text-base font-bold text-primary dark:text-white">Upcoming Renewals</h3>
                 </div>
+                <span
+                    class="text-[10px] font-black bg-teal-100 text-accent-teal dark:bg-teal-900/30 dark:text-teal-400 px-2 py-0.5 rounded uppercase">Next
+                    30 Days</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 dark:bg-slate-800/50">
+                        <tr>
+                            <th class="px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Service
+                            </th>
+                            <th class="px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Expiry
+                            </th>
+                            <th
+                                class="px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">
+                                Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @forelse($upcomingRenewals as $sub)
+                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="size-8 bg-teal-50 dark:bg-teal-950/30 text-accent-teal rounded flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-lg">language</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-primary dark:text-white">
+                                                {{ $sub->service->name }}</p>
+                                            <p class="text-[10px] text-slate-500">{{ $sub->client->name }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span
+                                        class="text-xs font-bold {{ $sub->next_billing_date->isPast() ? 'text-accent-red bg-red-50' : 'text-slate-500 bg-slate-100' }} dark:bg-slate-800 px-2 py-1 rounded">
+                                        {{ $sub->next_billing_date->format('M d, Y') }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <a href="{{ route('subscriptions.show', $sub) }}"
+                                        class="text-accent-teal hover:text-accent-teal-hover text-xs font-bold transition-all border border-accent-teal/20 hover:border-accent-teal px-3 py-1 rounded">View</a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-6 py-8 text-center text-slate-400 text-sm italic">No upcoming
+                                    renewals found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-                <!-- Recent Invoices -->
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-widest">
-                            {{ __('Recent Invoices') }}</h3>
-                    </div>
-                    <div class="p-6">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full">
-                                <thead>
-                                    <tr
-                                        class="text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                                        <th class="pb-3">{{ __('Invoice #') }}</th>
-                                        <th class="pb-3">{{ __('Client') }}</th>
-                                        <th class="pb-3">{{ __('Status') }}</th>
-                                        <th class="pb-3 text-right">{{ __('Total') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-sm">
-                                    @forelse($recentInvoices as $invoice)
-                                        <tr class="border-t border-gray-100 dark:border-gray-700">
-                                            <td class="py-4">
-                                                <a href="{{ route('invoices.show', $invoice) }}"
-                                                    class="font-medium text-gray-900 dark:text-white hover:text-indigo-600">
-                                                    {{ $invoice->invoice_number }}
-                                                </a>
-                                            </td>
-                                            <td class="py-4 text-gray-600 dark:text-gray-300">{{ $invoice->client->name }}
-                                            </td>
-                                            <td class="py-4">
-                                                <span
-                                                    class="px-2 py-1 text-xs font-bold rounded-full 
-                                                        {{ $invoice->status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                                    {{ strtoupper($invoice->status) }}
-                                                </span>
-                                            </td>
-                                            <td class="py-4 text-right font-bold">{{ number_format($invoice->total, 2) }}
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="py-4 text-center text-gray-500">
-                                                {{ __('No recent invoices.') }}</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+        <!-- Recent Invoices -->
+        <div
+            class="col-span-12 xl:col-span-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div
+                class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-teal font-bold">receipt_long</span>
+                    <h3 class="text-base font-bold text-primary dark:text-white">Recent Invoices</h3>
                 </div>
+                <span
+                    class="text-[10px] font-black bg-teal-100 text-accent-teal dark:bg-teal-900/30 dark:text-teal-400 px-2 py-0.5 rounded uppercase">Activity</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 dark:bg-slate-800/50">
+                        <tr>
+                            <th class="px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Invoice
+                                / Client</th>
+                            <th class="px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Amount
+                            </th>
+                            <th class="px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status
+                            </th>
+                            <th
+                                class="px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">
+                                Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @forelse($recentInvoices as $invoice)
+                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <p class="text-sm font-semibold text-primary dark:text-white">
+                                            {{ $invoice->invoice_number }}</p>
+                                        <p class="text-[10px] text-slate-500">{{ $invoice->client->name }}</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-sm font-bold text-primary dark:text-white">Rs.
+                                        {{ number_format($invoice->total, 2) }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span
+                                        class="text-[10px] font-bold px-2 py-0.5 rounded uppercase {{ $invoice->status == 'paid' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600' }}">
+                                        {{ $invoice->status }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <a href="{{ route('invoices.show', $invoice) }}"
+                                        class="text-accent-teal hover:text-accent-teal-hover text-xs font-bold transition-all">Details</a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center text-slate-400 text-sm italic">No recent
+                                    invoices.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit Logs Section -->
+    <div
+        class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <h3 class="text-base font-bold text-primary dark:text-white">Recent System Activity</h3>
+            <button
+                class="text-accent-teal hover:text-accent-teal-hover text-xs font-bold flex items-center gap-1 transition-colors">
+                Refresh Logs <span class="material-symbols-outlined text-sm">refresh</span>
+            </button>
+        </div>
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-800">
+            <div class="p-6">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="material-symbols-outlined text-accent-teal text-sm">alternate_email</span>
+                    <p class="text-[10px] font-black text-accent-teal uppercase tracking-widest">Email Status</p>
+                </div>
+                <p class="text-sm font-medium leading-relaxed dark:text-slate-300">Mail server active. Waiting for next
+                    batch.</p>
+                <p class="text-[10px] text-slate-500 mt-2">Running</p>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="material-symbols-outlined text-accent-teal text-sm">chat</span>
+                    <p class="text-[10px] font-black text-accent-teal uppercase tracking-widest">WhatsApp Service</p>
+                </div>
+                <p class="text-sm font-medium leading-relaxed dark:text-slate-300">Node.js microservice connected and
+                    ready.</p>
+                <p class="text-[10px] text-slate-500 mt-2">Authenticated</p>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="material-symbols-outlined text-accent-red text-sm">notifications_active</span>
+                    <p class="text-[10px] font-black text-accent-red uppercase tracking-widest">Alerts</p>
+                </div>
+                <p class="text-sm font-medium leading-relaxed dark:text-slate-300">{{ $stats['overdue_invoices'] }}
+                    invoices require immediate attention.</p>
+                <p class="text-[10px] text-slate-500 mt-2">Critical</p>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="material-symbols-outlined text-slate-400 text-sm">settings_suggest</span>
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">System</p>
+                </div>
+                <p class="text-sm font-medium leading-relaxed dark:text-slate-300">Daily database job completed
+                    successfully.</p>
+                <p class="text-[10px] text-slate-500 mt-2">Completed</p>
             </div>
         </div>
     </div>

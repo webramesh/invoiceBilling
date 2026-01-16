@@ -20,6 +20,7 @@ class DashboardController extends Controller
         $stats = [
             'total_clients' => Client::where('status', 'active')->count(),
             'active_subscriptions' => Subscription::where('status', 'active')->count(),
+            'total_services' => \App\Models\Service::count(),
             'revenue_month' => Payment::where('payment_date', '>=', $startOfMonth)->sum('amount'),
             'revenue_year' => Payment::where('payment_date', '>=', $startOfYear)->sum('amount'),
             'overdue_invoices' => Invoice::where('status', 'unpaid')->where('due_date', '<', $now->toDateString())->count(),
