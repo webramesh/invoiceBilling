@@ -75,12 +75,69 @@
                 @endisset
 
                 <div class="flex items-center gap-4">
-                    <div class="relative hidden md:block">
-                        <span
-                            class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-                        <input
-                            class="w-64 pl-11 pr-4 py-2.5 bg-background-light dark:bg-white/5 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm"
-                            placeholder="Search..." type="text" />
+                    <!-- User Profile Dropdown -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false"
+                            class="flex items-center gap-3 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all focus:outline-none">
+                            <div
+                                class="size-10 bg-primary/10 text-primary rounded-full flex items-center justify-center font-black text-sm border-2 border-white dark:border-slate-800 shadow-sm">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}{{ str_contains(Auth::user()->name, ' ') ? strtoupper(substr(explode(' ', Auth::user()->name)[1], 0, 1)) : '' }}
+                            </div>
+                            <div class="text-left hidden lg:block pr-2">
+                                <p class="text-xs font-bold text-[#121617] dark:text-white leading-tight">
+                                    {{ Auth::user()->name }}</p>
+                                <p class="text-[10px] font-medium text-gray-500 dark:text-gray-400">Super Admin</p>
+                            </div>
+                            <span
+                                class="material-symbols-outlined text-gray-400 text-lg transition-transform duration-200"
+                                :class="{'rotate-180': open}">expand_more</span>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-100"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 z-50 overflow-hidden"
+                            style="display: none;">
+
+                            <div class="p-4 border-b border-gray-50 dark:border-slate-800">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Account</p>
+                                <p class="text-sm font-bold text-[#121617] dark:text-white truncate">
+                                    {{ Auth::user()->email }}</p>
+                            </div>
+
+                            <div class="py-2">
+                                <a href="{{ route('profile.edit') }}"
+                                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                                    <span class="material-symbols-outlined text-lg opacity-60">person</span>
+                                    Edit Profile
+                                </a>
+                                <a href="{{ route('profile.edit') }}#update-password"
+                                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                                    <span class="material-symbols-outlined text-lg opacity-60">lock</span>
+                                    Change Password
+                                </a>
+                                <a href="#"
+                                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                                    <span class="material-symbols-outlined text-lg opacity-60">settings</span>
+                                    Settings
+                                </a>
+                            </div>
+
+                            <div class="p-2 border-t border-gray-50 dark:border-slate-800">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 font-bold hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-colors text-left">
+                                        <span class="material-symbols-outlined text-lg">logout</span>
+                                        Sign Out
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>

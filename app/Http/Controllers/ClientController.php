@@ -48,7 +48,9 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return view('clients.create');
+        $services = \App\Models\Service::all();
+        $billingCycles = \App\Models\BillingCycle::all();
+        return view('clients.create', compact('services', 'billingCycles'));
     }
 
     /**
@@ -64,9 +66,28 @@ class ClientController extends Controller
             'whatsapp_number' => 'nullable|string|max:20',
             'status' => 'required|in:active,inactive',
             'address' => 'nullable|string',
+            // Service assignment fields (optional)
+            'service_id' => 'nullable|exists:services,id',
+            'billing_cycle_id' => 'nullable|exists:billing_cycles,id',
+            'start_date' => 'nullable|date',
+            'price' => 'nullable|numeric|min:0',
         ]);
 
-        Client::create($validated);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
+            $client = Client::create(\Illuminate\Support\Arr::except($validated, ['service_id', 'billing_cycle_id', 'start_date', 'price']));
+
+            if (!empty($validated['service_id'])) {
+                $client->subscriptions()->create([
+                    'service_id' => $validated['service_id'],
+                    'billing_cycle_id' => $validated['billing_cycle_id'],
+                    'start_date' => $validated['start_date'] ?? now(),
+                    'next_billing_date' => $validated['start_date'] ?? now(),
+                    'price' => $validated['price'],
+                    'status' => 'active',
+                    'auto_renewal' => true,
+                ]);
+            }
+        });
 
         return redirect()->route('clients.index')->with('success', 'Client created successfully.');
     }
