@@ -44,23 +44,29 @@ class SubscriptionController extends Controller
             'billing_cycle_id' => 'required|exists:billing_cycles,id',
             'start_date' => 'required|date',
             'price' => 'nullable|numeric|min:0',
-            'auto_renewal' => 'nullable|boolean',
+            'auto_renewal' => 'nullable',
         ]);
 
-        if (empty($validated['price'])) {
-            $service = Service::find($validated['service_id']);
-            $validated['price'] = $service->base_price;
+        try {
+            $service = Service::findOrFail($validated['service_id']);
+            $billingCycle = BillingCycle::findOrFail($validated['billing_cycle_id']);
+
+            if (empty($validated['price']) && $validated['price'] !== '0' && $validated['price'] !== 0) {
+                $validated['price'] = $service->base_price;
+            }
+
+            $startDate = Carbon::parse($validated['start_date']);
+            $validated['next_billing_date'] = $startDate->copy()->addMonths($billingCycle->months);
+            $validated['status'] = 'active';
+            $validated['auto_renewal'] = $request->has('auto_renewal');
+
+            Subscription::create($validated);
+
+            return redirect()->route('subscriptions.index')->with('success', 'Service assigned to client successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Subscription creation failed: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Error assigning service: ' . $e->getMessage());
         }
-
-        $billingCycle = BillingCycle::find($validated['billing_cycle_id']);
-        $startDate = Carbon::parse($validated['start_date']);
-        $validated['next_billing_date'] = $startDate->copy()->addMonths($billingCycle->months);
-        $validated['status'] = 'active';
-        $validated['auto_renewal'] = $request->has('auto_renewal');
-
-        Subscription::create($validated);
-
-        return redirect()->route('subscriptions.index')->with('success', 'Service assigned to client successfully.');
     }
 
     /**
