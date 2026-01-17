@@ -16,12 +16,14 @@ const PORT = process.env.PORT || 3000;
 const SECURITY_TOKEN = process.env.SECURITY_TOKEN || 'your-secret-token';
 
 let qrBase64 = null;
-let connectionStatus = "Initializing...";
+let connectionStatus = "Disconnected";
 let lastError = null;
+let socket = null;
 
 const SESSION_FOLDER = path.join(__dirname, 'wa_session');
 
 async function startBridge() {
+    connectionStatus = "Starting WhatsApp Library...";
     try {
         if (!fs.existsSync(SESSION_FOLDER)) {
             fs.mkdirSync(SESSION_FOLDER, { recursive: true });
@@ -29,11 +31,11 @@ async function startBridge() {
 
         const { state, saveCreds } = await useMultiFileAuthState(SESSION_FOLDER);
 
-        const socket = makeWASocket({
+        socket = makeWASocket({
             auth: state,
             printQRInTerminal: false,
             logger: pino({ level: 'silent' }),
-            browser: ['NetSync Billing', 'Chrome', '1.0.0']
+            browser: ['Chrome', 'Chrome', '1.0.0']
         });
 
         socket.ev.on('creds.update', saveCreds);
@@ -43,82 +45,97 @@ async function startBridge() {
 
             if (qr) {
                 qrBase64 = await QRCode.toDataURL(qr);
-                connectionStatus = "Waiting for Scan";
+                connectionStatus = "READY TO SCAN";
             }
 
             if (connection === 'close') {
                 const reason = lastDisconnect?.error?.output?.statusCode;
-                connectionStatus = `Disconnected (Reason: ${reason})`;
-                const shouldReconnect = (reason !== DisconnectReason.loggedOut);
-                if (shouldReconnect) startBridge();
+                connectionStatus = `Stopped (Reason: ${reason})`;
+                lastError = `Connection closed with code: ${reason}`;
+                if (reason !== DisconnectReason.loggedOut) {
+                    setTimeout(startBridge, 3000);
+                }
             } else if (connection === 'open') {
-                connectionStatus = "Connected";
+                connectionStatus = "CONNECTED";
                 qrBase64 = null;
-            }
-        });
-
-        // API to send message
-        app.post('/api/send-message', async (req, res) => {
-            const { to, message } = req.body;
-            const auth = req.headers['authorization'];
-
-            if (auth !== `Bearer ${SECURITY_TOKEN}`) return res.status(401).send('Unauthorized');
-            if (connectionStatus !== "Connected") return res.status(503).send('WhatsApp not connected');
-
-            try {
-                const jid = to.replace(/\D/g, '') + '@s.whatsapp.net';
-                await socket.sendMessage(jid, { text: message });
-                res.json({ success: true });
-            } catch (err) {
-                res.status(500).json({ error: err.message });
+                lastError = null;
             }
         });
 
     } catch (err) {
         lastError = err.message;
-        connectionStatus = "Critical Error";
+        connectionStatus = "Startup Error";
+        console.error('Bridge startup error:', err);
     }
 }
 
-// GUI for monitoring
+// API Endpoint - Define OUTSIDE of startBridge function
+app.post('/api/send-message', async (req, res) => {
+    const { to, message } = req.body;
+    const auth = req.headers['authorization'];
+    
+    if (auth !== `Bearer ${SECURITY_TOKEN}`) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    if (!socket) {
+        return res.status(503).json({ error: 'WhatsApp socket not initialized' });
+    }
+    
+    try {
+        const jid = to.replace(/\D/g, '') + '@s.whatsapp.net';
+        await socket.sendMessage(jid, { text: message });
+        res.json({ success: true, message: 'Message sent successfully' });
+    } catch (err) {
+        console.error('Send message error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Status API endpoint
+app.get('/api/status', (req, res) => {
+    res.json({
+        status: connectionStatus,
+        hasQR: !!qrBase64,
+        error: lastError
+    });
+});
+
 app.get('/', (req, res) => {
     let html = `
-        <body style="font-family:sans-serif; text-align:center; padding: 50px; background: #f4f7f6;">
+        <body style="font-family:sans-serif; text-align:center; padding: 50px; background: #eef2f3;">
             <div style="background: white; padding: 40px; border-radius: 20px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                <h1>WhatsApp Bridge Status</h1>
-                <p>Status: <strong style="color: ${connectionStatus === 'Connected' ? 'green' : 'orange'}">${connectionStatus}</strong></p>
+                <h1 style="color: #333; margin-bottom: 5px;">WhatsApp Bridge Lite</h1>
+                <p style="color: #999; margin-top: 0; font-size: 14px;">v1.5 (Subdomain Edition)</p>
+                <p style="font-size: 1.2em; margin-top: 30px;">Status: <strong style="color: ${connectionStatus === 'CONNECTED' ? '#10b981' : '#f59e0b'}">${connectionStatus}</strong></p>
     `;
 
     if (qrBase64) {
         html += `
-            <h3>Scan this QR Code:</h3>
-            <div style="background: white; padding: 20px; border-radius: 10px; display: inline-block;">
+            <div style="margin: 30px 0; border: 2px dashed #ddd; padding: 20px; border-radius: 15px;">
+                <h3 style="color: #666; margin-top: 0;">Scan Now:</h3>
                 <img src="${qrBase64}" style="width: 250px; height: 250px;" />
+                <p style="color: #888; font-size: 12px;">Open WhatsApp > Linked Devices > Link a Device</p>
             </div>
-            <p>Expires in 60 seconds. Refresh page if it stops working.</p>
         `;
     }
 
     if (lastError) {
-        html += `<p style="color: red;">Error: ${lastError}</p>`;
+        html += `<p style="color: #dc2626; background: #fef2f2; padding: 10px; border-radius: 5px;"><strong>System Error:</strong> ${lastError}</p>`;
     }
 
     html += `
-                <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;" />
-                <p style="font-size: 12px; color: #999;">NetSync Billing Bridge v1.3</p>
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button onclick="window.location.reload()" style="padding: 10px 20px; border-radius: 10px; border: none; background: #2492a8; color: white; font-weight: bold; cursor: pointer;">Refresh Status</button>
-                </div>
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
+                <button onclick="window.location.reload()" style="padding: 12px 24px; border-radius: 10px; border: none; background: #000; color: white; font-weight: bold; cursor: pointer;">REFRESH STATUS</button>
             </div>
         </body>
     `;
     res.send(html);
 });
 
-app.get('/api/status', (req, res) => res.json({ status: connectionStatus }));
-
 app.listen(PORT, () => {
-    console.log('Bridge running on port ' + PORT);
+    console.log(`WhatsApp Bridge started on port ${PORT}`);
+    console.log(`Security Token: ${SECURITY_TOKEN.substring(0, 5)}...`);
+    console.log(`Session Folder: ${SESSION_FOLDER}`);
+    startBridge();
 });
-
-startBridge();
