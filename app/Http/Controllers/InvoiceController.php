@@ -34,7 +34,7 @@ class InvoiceController extends Controller
 
         $stats = [
             'total_outstanding' => Invoice::where('status', 'unpaid')->sum('total'),
-            'total_paid_month' => \App\Models\Payment::whereMonth('payment_date', now()->month)->sum('amount'),
+            'total_paid_month' => Payment::whereMonth('payment_date', now()->month)->sum('amount'),
         ];
 
         return view('invoices.index', compact('invoices', 'stats'));
@@ -79,6 +79,33 @@ class InvoiceController extends Controller
         $invoice->load(['client', 'subscription', 'items']);
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.pdf', compact('invoice'));
         return $pdf->download($invoice->invoice_number . '.pdf');
+    }
+
+    public function sendEmail(Invoice $invoice)
+    {
+        try {
+            \Illuminate\Support\Facades\Mail::to($invoice->client->email)->send(new \App\Mail\InvoiceMailable($invoice));
+            return back()->with('success', 'Invoice email sent successfully to ' . $invoice->client->email);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Mail Error: ' . $e->getMessage());
+            return back()->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
+    }
+
+    public function sendWhatsApp(Invoice $invoice, \App\Services\WhatsAppService $waService)
+    {
+        $message = "Hello " . $invoice->client->name . ",\n\n" .
+            "Your invoice #" . $invoice->invoice_number . " for " . ($invoice->subscription->service->name ?? 'Service') . " is ready.\n" .
+            "Amount: Rs. " . number_format($invoice->total, 2) . "\n" .
+            "Due Date: " . \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') . "\n\n" .
+            "Please pay before the due date to avoid service interruption.\n" .
+            "Thank you!";
+
+        if ($waService->sendMessage($invoice->client->whatsapp_number, $message)) {
+            return back()->with('success', 'WhatsApp message sent successfully.');
+        }
+
+        return back()->with('error', 'Failed to send WhatsApp message. Please check API settings.');
     }
 
     /**
