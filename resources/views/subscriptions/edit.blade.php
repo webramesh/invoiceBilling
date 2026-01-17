@@ -11,6 +11,27 @@
     </x-slot>
 
     <div class="max-w-5xl mx-auto py-8 space-y-8">
+        @if ($errors->any())
+            <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 flex items-start gap-3">
+                <span class="material-symbols-outlined text-red-500">error</span>
+                <div class="flex-1">
+                    <p class="text-sm font-bold text-red-700 dark:text-red-400">Please correct the following errors:</p>
+                    <ul class="list-disc list-inside text-xs text-red-600 dark:text-red-400 mt-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-500">error</span>
+                <p class="text-sm font-bold text-red-700 dark:text-red-400">{{ session('error') }}</p>
+            </div>
+        @endif
+
         <!-- Dashboard Style Summary Area -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div
@@ -159,57 +180,73 @@
                         </div>
                     </div>
 
-                    <hr class="border-[#f1f3f4] dark:border-slate-800"/>
+                    <hr class="border-[#f1f3f4] dark:border-slate-800" />
 
                     <!-- Section: Automation & Notifications -->
                     <div class="space-y-6">
-                        <h3 class="text-sm font-bold text-[#121617] dark:text-white uppercase tracking-wider px-1">Automation & Notifications</h3>
-                        
-                        <div class="flex items-center justify-between p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-[#dce3e4] dark:border-gray-800 transition-all hover:border-primary/30">
+                        <h3 class="text-sm font-bold text-[#121617] dark:text-white uppercase tracking-wider px-1">
+                            Automation & Notifications</h3>
+
+                        <div
+                            class="flex items-center justify-between p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-[#dce3e4] dark:border-gray-800 transition-all hover:border-primary/30">
                             <div class="flex items-center gap-4">
                                 <div class="bg-[#25D366]/10 p-2 rounded-lg">
                                     <span class="material-symbols-outlined text-[#25D366]">chat</span>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-sm text-[#121617] dark:text-white">Automatic WhatsApp Reminders</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Send payment alerts 3 days before the due date.</p>
+                                    <p class="font-semibold text-sm text-[#121617] dark:text-white">Automatic WhatsApp
+                                        Reminders</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Send payment alerts 3 days
+                                        before the due date.</p>
                                 </div>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input name="whatsapp_notifications" type="checkbox" class="sr-only peer" {{ old('whatsapp_notifications', $subscription->whatsapp_notifications) ? 'checked' : '' }}>
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                <div
+                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                                </div>
                             </label>
                         </div>
 
-                        <div class="flex items-center justify-between p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-[#dce3e4] dark:border-gray-800 transition-all hover:border-primary/30">
+                        <div
+                            class="flex items-center justify-between p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-[#dce3e4] dark:border-gray-800 transition-all hover:border-primary/30">
                             <div class="flex items-center gap-4">
                                 <div class="bg-primary/10 p-2 rounded-lg">
                                     <span class="material-symbols-outlined text-primary">mail</span>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-sm text-[#121617] dark:text-white">Automatic Email Invoicing</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Generate and email PDF invoices automatically on the billing date.</p>
+                                    <p class="font-semibold text-sm text-[#121617] dark:text-white">Automatic Email
+                                        Invoicing</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Generate and email PDF invoices
+                                        automatically on the billing date.</p>
                                 </div>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input name="email_notifications" type="checkbox" class="sr-only peer" {{ old('email_notifications', $subscription->email_notifications) ? 'checked' : '' }}>
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                <div
+                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                                </div>
                             </label>
                         </div>
 
-                        <div class="flex items-center justify-between p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-[#dce3e4] dark:border-gray-800 transition-all hover:border-primary/30">
+                        <div
+                            class="flex items-center justify-between p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-[#dce3e4] dark:border-gray-800 transition-all hover:border-primary/30">
                             <div class="flex items-center gap-4">
                                 <div class="bg-primary/10 p-2 rounded-lg">
                                     <span class="material-symbols-outlined text-primary">event_repeat</span>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-sm text-[#121617] dark:text-white">Recursive Renewal</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Automatically renew subscription and extend validity.</p>
+                                    <p class="font-semibold text-sm text-[#121617] dark:text-white">Recursive Renewal
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Automatically renew subscription
+                                        and extend validity.</p>
                                 </div>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input name="auto_renewal" type="checkbox" class="sr-only peer" {{ old('auto_renewal', $subscription->auto_renewal) ? 'checked' : '' }}>
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                <div
+                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                                </div>
                             </label>
                         </div>
                     </div>

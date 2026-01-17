@@ -12,6 +12,17 @@ class Service extends Model
         'description',
         'base_price',
         'status',
+        'tax_status',
+        'tax_rate',
+        'billing_options',
+        'is_draft',
+    ];
+
+    protected $casts = [
+        'billing_options' => 'array',
+        'is_draft' => 'boolean',
+        'base_price' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
     ];
 
     public function category()
