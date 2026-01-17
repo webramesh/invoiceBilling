@@ -63,39 +63,44 @@
         <main class="flex-1 ml-64 min-w-0 flex flex-col">
             <!-- Header -->
             <header
-                class="bg-white dark:bg-background-dark border-b border-gray-200 dark:border-white/10 px-8 py-6 flex flex-wrap justify-between items-center sticky top-0 z-40">
-                @isset($header)
-                    {{ $header }}
-                @else
-                    <div>
-                        <h2 class="text-3xl font-black text-[#121617] dark:text-white tracking-tight leading-none">Dashboard
-                        </h2>
-                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-2 font-medium">Platform overview and
-                            statistics</p>
-                    </div>
-                @endisset
+                class="sticky top-0 z-40 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-[#e4e7eb] dark:border-white/10 px-8 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <form action="{{ url()->current() }}" method="GET"
+                        class="bg-gray-100 dark:bg-white/5 rounded-lg flex items-center px-3 py-2 w-80">
+                        @foreach(request()->except('search') as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endforeach
+                        <span class="material-symbols-outlined text-gray-400 text-xl">search</span>
+                        <input name="search" value="{{ request('search') }}"
+                            class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-gray-400 dark:text-white"
+                            placeholder="Search records..." type="text" />
+                    </form>
+                </div>
 
                 <div class="flex items-center gap-4">
-                    <!-- User Profile Dropdown -->
+                    <button
+                        class="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg relative">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span
+                            class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
+                    </button>
+                    <div class="h-8 w-[1px] bg-gray-200 dark:bg-white/10"></div>
+
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" @click.away="open = false"
-                            class="flex items-center gap-3 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all focus:outline-none">
-                            <div
-                                class="size-10 bg-primary/10 text-primary rounded-full flex items-center justify-center font-black text-sm border-2 border-white dark:border-slate-800 shadow-sm">
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}{{ str_contains(Auth::user()->name, ' ') ? strtoupper(substr(explode(' ', Auth::user()->name)[1], 0, 1)) : '' }}
-                            </div>
-                            <div class="text-left hidden lg:block pr-2">
-                                <p class="text-xs font-bold text-[#121617] dark:text-white leading-tight">
+                            class="flex items-center gap-3 transition-all focus:outline-none group">
+                            <div class="text-right hidden lg:block">
+                                <p class="text-sm font-bold leading-none text-[#121617] dark:text-white">
                                     {{ Auth::user()->name }}
                                 </p>
-                                <p class="text-[10px] font-medium text-gray-500 dark:text-gray-400">Super Admin</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Super Admin</p>
                             </div>
-                            <span
-                                class="material-symbols-outlined text-gray-400 text-lg transition-transform duration-200"
-                                :class="{'rotate-180': open}">expand_more</span>
+                            <div
+                                class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20 group-hover:border-primary/40 transition-colors">
+                                <span class="material-symbols-outlined text-primary">person</span>
+                            </div>
                         </button>
 
-                        <!-- Dropdown Menu -->
                         <div x-show="open" x-transition:enter="transition ease-out duration-100"
                             x-transition:enter-start="transform opacity-0 scale-95"
                             x-transition:enter-end="transform opacity-100 scale-100"
@@ -144,6 +149,13 @@
                     </div>
                 </div>
             </header>
+
+            <!-- Page Title Area (Optional slot for page-specific headers) -->
+            @isset($header)
+                <div class="px-8 pt-8">
+                    {{ $header }}
+                </div>
+            @endisset
 
             <!-- Page Content -->
             <div class="p-8">

@@ -128,17 +128,27 @@ class SubscriptionController extends Controller
             'billing_cycle_id' => 'required|exists:billing_cycles,id',
             'start_date' => 'required|date',
             'next_billing_date' => 'required|date',
-            'price' => 'required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
             'status' => 'required|in:active,suspended,cancelled',
-            'auto_renewal' => 'nullable|boolean',
         ]);
 
-        $validated['auto_renewal'] = $request->has('auto_renewal');
-        $validated['whatsapp_notifications'] = $request->has('whatsapp_notifications');
-        $validated['email_notifications'] = $request->has('email_notifications');
-        $subscription->update($validated);
+        try {
+            $service = Service::findOrFail($validated['service_id']);
+            if (empty($validated['price']) && $validated['price'] !== '0' && $validated['price'] !== 0) {
+                $validated['price'] = $service->base_price;
+            }
 
-        return redirect()->route('subscriptions.index')->with('success', 'Subscription updated successfully.');
+            $validated['auto_renewal'] = $request->has('auto_renewal');
+            $validated['whatsapp_notifications'] = $request->has('whatsapp_notifications');
+            $validated['email_notifications'] = $request->has('email_notifications');
+
+            $subscription->update($validated);
+
+            return redirect()->route('subscriptions.index')->with('success', 'Subscription updated successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Subscription update failed: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Update failed: ' . $e->getMessage());
+        }
     }
 
     /**

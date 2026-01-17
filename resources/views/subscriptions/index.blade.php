@@ -7,6 +7,23 @@
         </div>
     </x-slot>
 
+    <!-- Flash Messages -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+        @if (session('success'))
+            <div class="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-500">check_circle</span>
+                <p class="text-sm font-bold text-green-700 dark:text-green-400">{{ session('success') }}</p>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-500">error</span>
+                <p class="text-sm font-bold text-red-700 dark:text-red-400">{{ session('error') }}</p>
+            </div>
+        @endif
+    </div>
+
     <!-- Header Action Bar -->
     <div class="mb-8 flex justify-end">
         <a href="{{ route('subscriptions.create') }}"
@@ -28,7 +45,8 @@
                     </div>
                 </div>
                 <p class="text-3xl font-black text-[#121617] dark:text-white mb-1">Rs.
-                    {{ number_format($stats['total_mrr']) }}</p>
+                    {{ number_format($stats['total_mrr']) }}
+                </p>
                 <p class="text-sm font-bold text-green-600 flex items-center gap-1">
                     <span class="material-symbols-outlined text-sm">north_east</span> Active Revenue
                 </p>

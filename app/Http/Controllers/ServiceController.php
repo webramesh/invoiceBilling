@@ -11,10 +11,35 @@ class ServiceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $services = Service::with('category')->latest()->paginate(10);
-        return view('services.index', compact('services'));
+        $query = Service::with('category')->withCount([
+            'subscriptions as active_clients_count' => function ($query) {
+                $query->where('status', 'active');
+            }
+        ]);
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('category', function ($catQuery) use ($search) {
+                        $catQuery->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $services = $query->latest()->paginate(10)->withQueryString();
+
+        $stats = [
+            'total_services' => Service::count(),
+            'services_this_month' => Service::whereMonth('created_at', now()->month)->count(),
+            'active_subscriptions' => \App\Models\Subscription::where('status', 'active')->count(),
+            'total_revenue' => \App\Models\Subscription::where('status', 'active')->sum('price'),
+        ];
+
+        return view('services.index', compact('services', 'stats'));
     }
 
     /**
@@ -23,7 +48,8 @@ class ServiceController extends Controller
     public function create()
     {
         $categories = ServiceCategory::all();
-        return view('services.create', compact('categories'));
+        $billingCycles = \App\Models\BillingCycle::all();
+        return view('services.create', compact('categories', 'billingCycles'));
     }
 
     /**
@@ -37,7 +63,14 @@ class ServiceController extends Controller
             'description' => 'nullable|string',
             'base_price' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive',
+            'tax_status' => 'required|string',
+            'tax_rate' => 'nullable|numeric|min:0',
+            'billing_options' => 'nullable|array',
+            'is_draft' => 'nullable',
         ]);
+
+        $validated['is_draft'] = $request->has('is_draft');
+        $validated['status'] = $validated['status'] ?? 'active';
 
         Service::create($validated);
 
@@ -58,7 +91,8 @@ class ServiceController extends Controller
     public function edit(Service $service)
     {
         $categories = ServiceCategory::all();
-        return view('services.edit', compact('service', 'categories'));
+        $billingCycles = \App\Models\BillingCycle::all();
+        return view('services.edit', compact('service', 'categories', 'billingCycles'));
     }
 
     /**
@@ -72,7 +106,13 @@ class ServiceController extends Controller
             'description' => 'nullable|string',
             'base_price' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive',
+            'tax_status' => 'required|string',
+            'tax_rate' => 'nullable|numeric|min:0',
+            'billing_options' => 'nullable|array',
+            'is_draft' => 'nullable',
         ]);
+
+        $validated['is_draft'] = $request->has('is_draft');
 
         $service->update($validated);
 
