@@ -17,37 +17,17 @@
         rel="stylesheet" />
 
     <!-- Scripts -->
+    <!-- Scripts and Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#2492a8",
-                        "danger": "#BF1E2D",
-                        "background-light": "#f9fafa",
-                        "background-dark": "#16181d",
-                        "accent-emerald": "#10b981",
-                        "accent-red": "#ef4444",
-                    },
-                    fontFamily: {
-                        "display": ["Manrope", "sans-serif"]
-                    },
-                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
-    <style type="text/tailwindcss">
+    <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+
         .sidebar-item-active {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-left: 4px solid white;
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            border-left: 4px solid white !important;
             color: white !important;
         }
     </style>
