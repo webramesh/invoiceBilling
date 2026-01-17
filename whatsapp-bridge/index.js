@@ -15,13 +15,20 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const SECURITY_TOKEN = process.env.SECURITY_TOKEN || 'your-secret-token';
 
-async function connectToWhatsApp() {
-    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
+// Use a session folder that is guaranteed to be in the app root
+const SESSION_FOLDER = path.join(process.cwd(), 'wa_session');
+if (!fs.existsSync(SESSION_FOLDER)) {
+    fs.mkdirSync(SESSION_FOLDER, { recursive: true });
+}
+
+async function startBridge() {
+    const { state, saveCreds } = await useMultiFileAuthState(SESSION_FOLDER);
 
     const socket = makeWASocket({
         auth: state,
-        printQRInTerminal: true,
-        logger: pino({ level: 'silent' })
+        printQRInTerminal: false,
+        logger: pino({ level: 'silent' }),
+        browser: ['NetSync Billing', 'Chrome', '1.0.0']
     });
 
     socket.ev.on('creds.update', saveCreds);
@@ -30,44 +37,25 @@ async function connectToWhatsApp() {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            // Save QR code to a file so cPanel user can view/scan it
-            QRCode.toFile(path.join(__dirname, 'qr.png'), qr, (err) => {
-                if (err) console.error('Failed to save QR code:', err);
-                else console.log('QR Code generated! Open qr.png in your file manager to scan.');
-            });
+            // Save QR to public_html or similar if possible, but for now app root
+            QRCode.toFile(path.join(process.cwd(), 'qr.png'), qr);
         }
 
         if (connection === 'close') {
             const shouldReconnect = (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut);
-            console.log('connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect);
-            if (shouldReconnect) {
-                connectToWhatsApp();
-            }
-        } else if (connection === 'open') {
-            console.log('opened connection');
-            // Remove qr.png once connected
-            if (fs.existsSync(path.join(__dirname, 'qr.png'))) {
-                fs.unlinkSync(path.join(__dirname, 'qr.png'));
-            }
+            if (shouldReconnect) startBridge();
         }
     });
 
-    // API Endpoint to send message
+    // API to send message
     app.post('/api/send-message', async (req, res) => {
         const { to, message } = req.body;
-        const authHeader = req.headers['authorization'];
+        const auth = req.headers['authorization'];
 
-        // Token Validation
-        if (authHeader !== `Bearer ${SECURITY_TOKEN}`) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        if (!to || !message) {
-            return res.status(400).json({ error: 'Missing parameters' });
-        }
+        if (auth !== `Bearer ${SECURITY_TOKEN}`) return res.status(401).send('Unauthorized');
 
         try {
-            const jid = to.includes('@s.whatsapp.net') ? to : `${to}@s.whatsapp.net`;
+            const jid = to.replace(/\D/g, '') + '@s.whatsapp.net';
             await socket.sendMessage(jid, { text: message });
             res.json({ success: true });
         } catch (err) {
@@ -75,9 +63,12 @@ async function connectToWhatsApp() {
         }
     });
 
-    app.listen(PORT, () => {
-        console.log(`WhatsApp Bridge Running on port ${PORT}`);
-    });
+    // Pulse check
+    app.get('/', (req, res) => res.send('WhatsApp Bridge is Active'));
+
+    app.listen(PORT);
 }
 
-connectToWhatsApp();
+startBridge().catch(err => {
+    fs.writeFileSync(path.join(process.cwd(), 'error.log'), err.message);
+});
