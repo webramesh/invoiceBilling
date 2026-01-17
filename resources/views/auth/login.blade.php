@@ -6,43 +6,13 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Bill Everything') }} - Login</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#2492a8",
-                        "background-light": "#f9fafa",
-                        "background-dark": "#1a1d23",
-                    },
-                    fontFamily: {
-                        "display": ["Manrope", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Manrope', sans-serif;
-        }
-
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    
+    <!-- Scripts and Styles -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body
