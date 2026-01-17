@@ -109,14 +109,20 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-center gap-2">
-                                        <button class="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-transform active:scale-95">
-                                            <span class="material-symbols-outlined text-sm">chat_bubble</span>
-                                            WhatsApp
-                                        </button>
-                                        <button class="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-transform active:scale-95">
-                                            <span class="material-symbols-outlined text-sm">mail</span>
-                                            Email
-                                        </button>
+                                        <form action="{{ route('invoices.send-whatsapp', $invoice) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-transform active:scale-95">
+                                                <span class="material-symbols-outlined text-sm">chat_bubble</span>
+                                                WhatsApp
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('invoices.send-email', $invoice) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-transform active:scale-95">
+                                                <span class="material-symbols-outlined text-sm">mail</span>
+                                                Email
+                                            </button>
+                                        </form>
                                         <a href="{{ route('invoices.show', $invoice) }}" class="p-1.5 text-gray-400 hover:text-primary transition-colors">
                                             <span class="material-symbols-outlined text-xl">visibility</span>
                                         </a>

@@ -46,8 +46,14 @@
 
         <a href="{{ route('profile.edit') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('profile.*') ? 'sidebar-item-active' : 'hover:bg-white/10' }}">
-            <span class="material-symbols-outlined">settings</span>
-            <span class="text-sm font-medium">Settings</span>
+            <span class="material-symbols-outlined">person</span>
+            <span class="text-sm font-medium">Account</span>
+        </a>
+
+        <a href="{{ route('settings.index') }}"
+            class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('settings.*') ? 'sidebar-item-active' : 'hover:bg-white/10' }}">
+            <span class="material-symbols-outlined">tune</span>
+            <span class="text-sm font-medium">System Settings</span>
         </a>
 
         <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
