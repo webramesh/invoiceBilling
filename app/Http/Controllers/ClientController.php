@@ -97,7 +97,14 @@ class ClientController extends Controller
      */
     public function show(Client $client)
     {
-        $client->load(['subscriptions.service', 'invoices']);
+        $client->load([
+            'subscriptions.service',
+            'subscriptions.billingCycle',
+            'invoices',
+            'notifications' => function ($q) {
+                $q->latest()->limit(5);
+            }
+        ]);
         return view('clients.show', compact('client'));
     }
 
