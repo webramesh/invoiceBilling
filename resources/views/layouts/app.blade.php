@@ -18,6 +18,9 @@
 
     <!-- Scripts and Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Design System Fallback & Configuration (Disabled for Production) -->
+    {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
 </head>
 
 <body
