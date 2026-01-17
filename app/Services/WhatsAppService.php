@@ -29,7 +29,7 @@ class WhatsAppService
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post($this->apiUrl . '/send-message', [
+            ])->post($this->apiUrl . '/api/send-message', [
                         'to' => $this->formatNumber($to),
                         'message' => $message,
                     ]);
