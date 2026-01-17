@@ -27,8 +27,9 @@
                 extend: {
                     colors: {
                         "primary": "#2492a8",
-                        "background-light": "#f6f8f8",
-                        "background-dark": "#121d20",
+                        "danger": "#BF1E2D",
+                        "background-light": "#f9fafa",
+                        "background-dark": "#16181d",
                         "accent-emerald": "#10b981",
                         "accent-red": "#ef4444",
                     },
