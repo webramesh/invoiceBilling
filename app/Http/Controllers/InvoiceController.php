@@ -12,10 +12,32 @@ class InvoiceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $invoices = Invoice::with('client')->latest()->paginate(10);
-        return view('invoices.index', compact('invoices'));
+        $query = Invoice::with(['client', 'subscription.service']);
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_number', 'like', "%{$search}%")
+                    ->orWhereHas('client', function ($cq) use ($search) {
+                        $cq->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $invoices = $query->latest()->paginate(10)->withQueryString();
+
+        $stats = [
+            'total_outstanding' => Invoice::where('status', 'unpaid')->sum('total'),
+            'total_paid_month' => \App\Models\Payment::whereMonth('payment_date', now()->month)->sum('amount'),
+        ];
+
+        return view('invoices.index', compact('invoices', 'stats'));
     }
 
     /**
