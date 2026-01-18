@@ -149,6 +149,85 @@
         </div>
 
         <!-- Communication History Section -->
+        <!-- Invoices Section -->
+        <section
+            class="bg-white dark:bg-background-dark p-6 rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100 dark:border-white/5">
+                <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">receipt_long</span>
+                <h3 class="text-lg font-bold text-[#121617] dark:text-white">Invoices</h3>
+                <span class="ml-auto text-xs font-bold text-gray-500">Total: {{ $client->invoices->count() }}</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <p class="text-xs font-bold text-gray-400 uppercase">Paid</p>
+                    <p class="text-2xl font-black text-green-600">{{ $client->invoices->where('status', 'paid')->count() }}</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <p class="text-xs font-bold text-gray-400 uppercase">Unpaid</p>
+                    <p class="text-2xl font-black text-orange-600">{{ $client->invoices->where('status', 'unpaid')->count() }}</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <p class="text-xs font-bold text-gray-400 uppercase">Overdue</p>
+                    <p class="text-2xl font-black text-red-600">{{ $client->invoices->where('status', 'overdue')->count() }}</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-white/5">
+                            <th class="py-3 pl-2">Invoice #</th>
+                            <th class="py-3">Issue Date</th>
+                            <th class="py-3">Due Date</th>
+                            <th class="py-3 text-right pr-2">Amount</th>
+                            <th class="py-3 text-center">Status</th>
+                            <th class="py-3 text-right pr-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 dark:divide-white/5">
+                        @forelse($client->invoices->sortByDesc('issue_date')->take(8) as $inv)
+                            <tr class="group hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                                <td class="py-4 pl-2 font-bold text-sm text-primary">#{{ $inv->invoice_number }}</td>
+                                <td class="py-4 text-sm">{{ $inv->issue_date->format('M d, Y') }}</td>
+                                <td class="py-4 text-sm">{{ $inv->due_date->format('M d, Y') }}</td>
+                                <td class="py-4 text-sm font-black text-right pr-2">Rs. {{ number_format($inv->total, 2) }}</td>
+                                <td class="py-4 text-center">
+                                    @php
+                                        $statusClass = [
+                                            'paid' => 'bg-green-500/10 text-green-600',
+                                            'unpaid' => 'bg-orange-500/10 text-orange-600',
+                                            'overdue' => 'bg-red-500/10 text-red-600',
+                                        ][$inv->status] ?? 'bg-gray-100 text-gray-600';
+                                    @endphp
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-tighter {{ $statusClass }}">
+                                        {{ $inv->status }}
+                                    </span>
+                                </td>
+                                <td class="py-4 text-right pr-2">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="{{ route('invoices.show', $inv) }}" class="text-gray-400 hover:text-primary">
+                                            <span class="material-symbols-outlined">visibility</span>
+                                        </a>
+                                        <a href="{{ route('invoices.download', $inv) }}" class="text-gray-400 hover:text-gray-700">
+                                            <span class="material-symbols-outlined">download</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-gray-400 italic">No invoices generated for this client yet.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="pt-4 text-right">
+                <a href="{{ route('invoices.index', ['search' => $client->name]) }}" class="text-xs font-bold text-primary hover:underline">View All Invoices</a>
+            </div>
+        </section>
+
         <section
             class="bg-white dark:bg-background-dark p-6 rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm">
             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100 dark:border-white/5">

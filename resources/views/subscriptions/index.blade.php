@@ -183,6 +183,13 @@
                                                     class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700">
                                                     <span class="material-symbols-outlined text-lg">edit</span> Edit Service
                                                 </a>
+                                                <form action="{{ route('subscriptions.generate-invoice', $sub) }}" method="POST" class="w-full">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="w-full flex items-center gap-3 px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/10">
+                                                        <span class="material-symbols-outlined text-lg">receipt_long</span> Generate Invoice
+                                                    </button>
+                                                </form>
                                                 <form action="{{ route('subscriptions.destroy', $sub) }}" method="POST"
                                                     class="w-full" onsubmit="return confirm('Archive this service?')">
                                                     @csrf @method('DELETE')

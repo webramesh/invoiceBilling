@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Models\BillingCycle;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Services\InvoiceService;
 
 class SubscriptionController extends Controller
 {
@@ -163,5 +164,33 @@ class SubscriptionController extends Controller
         $subscription->delete();
 
         return redirect()->route('subscriptions.index')->with('success', 'Subscription deleted successfully.');
+    }
+
+    /**
+     * Generate an invoice for a subscription on-demand.
+     */
+    public function generateInvoice(Subscription $subscription, InvoiceService $invoiceService)
+    {
+        if ($subscription->status !== 'active') {
+            return back()->with('error', 'Only active subscriptions can generate invoices.');
+        }
+
+        try {
+            $invoice = $invoiceService->generateForSubscription($subscription);
+
+            // Send email notification if enabled (best-effort)
+            if ($subscription->email_notifications && $subscription->client && $subscription->client->email) {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($subscription->client->email)->send(new \App\Mail\InvoiceMailable($invoice));
+                } catch (\Exception $e) {
+                    \Log::error('Invoice email failed: ' . $e->getMessage());
+                }
+            }
+
+            return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice generated: ' . $invoice->invoice_number);
+        } catch (\Exception $e) {
+            \Log::error('Invoice generation failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to generate invoice: ' . $e->getMessage());
+        }
     }
 }

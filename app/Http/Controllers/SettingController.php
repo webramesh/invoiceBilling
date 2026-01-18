@@ -25,7 +25,8 @@ class SettingController extends Controller
             'mail_from_address',
             'mail_from_name',
             'whatsapp_api_url',
-            'whatsapp_api_key'
+            'whatsapp_api_key',
+            'whatsapp_template'
         ];
 
         foreach ($keys as $key) {

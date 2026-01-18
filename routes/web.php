@@ -14,6 +14,10 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Public Invoice Routes
+Route::get('i/{hash}', [\App\Http\Controllers\PublicInvoiceController::class, 'show'])->name('invoices.public.show');
+Route::get('i/{hash}/download', [\App\Http\Controllers\PublicInvoiceController::class, 'downloadPdf'])->name('invoices.public.download');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -21,6 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('services', ServiceController::class);
     Route::resource('service-categories', ServiceCategoryController::class);
     Route::resource('subscriptions', SubscriptionController::class);
+    Route::post('subscriptions/{subscription}/generate-invoice', [\App\Http\Controllers\SubscriptionController::class, 'generateInvoice'])->name('subscriptions.generate-invoice');
     Route::resource('invoices', InvoiceController::class);
     Route::post('invoices/{invoice}/mark-as-paid', [InvoiceController::class, 'markAsPaid'])->name('invoices.mark-as-paid');
     Route::get('invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoices.download');
