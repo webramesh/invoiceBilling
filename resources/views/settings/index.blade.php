@@ -185,22 +185,97 @@
             </form>
 
             <!-- WhatsApp Settings Form -->
-            <div x-show="activeTab === 'whatsapp'" x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-                <section
-                    class="bg-white dark:bg-[#1f2228] rounded-2xl p-16 text-center border border-dashed border-gray-200 dark:border-white/10 shadow-sm">
-                    <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <span class="material-symbols-outlined text-primary text-4xl font-fill">chat_bubble</span>
+            <form action="{{ route('settings.update') }}" method="POST" x-show="activeTab === 'whatsapp'"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4"
+                x-transition:enter-end="opacity-100 translate-y-0" class="space-y-8">
+                @csrf
+
+                <div class="grid grid-cols-1 gap-8">
+                    <!-- WhatsApp Configuration Card -->
+                    <section class="card-premium">
+                        <div class="card-header">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                                    <span
+                                        class="material-symbols-outlined text-primary font-fill text-xl">chat_bubble</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-[#121617] dark:text-white">WhatsApp Configuration
+                                    </h3>
+                                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Direct
+                                        Communication</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="grid grid-cols-1 gap-8">
+                                <div class="form-group">
+                                    <label class="form-label">Message Template</label>
+                                    <textarea name="whatsapp_template"
+                                        class="form-input min-h-[150px] font-mono text-sm"
+                                        placeholder="Hello {name}, your invoice {invoice_number} is ready...">{{ $settings['whatsapp_template'] ?? "Hello {name},\n\nYour invoice #{invoice_number} for {service_name} is ready.\n\nAmount: Rs. {amount}\nDue Date: {due_date}\n\nView Invoice: {invoice_url}\n\nThank you!" }}</textarea>
+                                    <div class="mt-4 flex flex-wrap gap-2">
+                                        <span
+                                            class="px-2 py-1 bg-gray-100 dark:bg-white/5 rounded text-[10px] font-bold text-gray-400 uppercase tracking-widest">{name}</span>
+                                        <span
+                                            class="px-2 py-1 bg-gray-100 dark:bg-white/5 rounded text-[10px] font-bold text-gray-400 uppercase tracking-widest">{invoice_number}</span>
+                                        <span
+                                            class="px-2 py-1 bg-gray-100 dark:bg-white/5 rounded text-[10px] font-bold text-gray-400 uppercase tracking-widest">{service_name}</span>
+                                        <span
+                                            class="px-2 py-1 bg-gray-100 dark:bg-white/5 rounded text-[10px] font-bold text-gray-400 uppercase tracking-widest">{amount}</span>
+                                        <span
+                                            class="px-2 py-1 bg-gray-100 dark:bg-white/5 rounded text-[10px] font-bold text-gray-400 uppercase tracking-widest">{due_date}</span>
+                                        <span
+                                            class="px-2 py-1 bg-gray-100 dark:bg-white/5 rounded text-[10px] font-bold text-gray-400 uppercase tracking-widest">{invoice_url}</span>
+                                    </div>
+                                    <p class="form-help mt-3">This message will be pre-filled when you click the
+                                        WhatsApp button.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Hidden Bridge Settings (for advanced users) -->
+                    <div x-data="{ showAdvanced: false }" class="space-y-4">
+                        <button type="button" @click="showAdvanced = !showAdvanced"
+                            class="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm"
+                                x-text="showAdvanced ? 'expand_less' : 'expand_more'"></span>
+                            Advanced Bridge Settings (Optional)
+                        </button>
+
+                        <div x-show="showAdvanced" x-collapse>
+                            <section class="card-premium">
+                                <div class="card-body">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div class="form-group">
+                                            <label class="form-label">API URL</label>
+                                            <input name="whatsapp_api_url"
+                                                value="{{ $settings['whatsapp_api_url'] ?? '' }}" class="form-input"
+                                                placeholder="http://localhost:3001" type="text" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">API Key</label>
+                                            <input name="whatsapp_api_key"
+                                                value="{{ $settings['whatsapp_api_key'] ?? '' }}" class="form-input"
+                                                placeholder="Your API Secret" type="password" />
+                                        </div>
+                                    </div>
+                                    <p class="form-help mt-4">Only needed if you want to use the automated background
+                                        bridge.</p>
+                                </div>
+                            </section>
+                        </div>
                     </div>
-                    <h2 class="text-2xl font-black text-[#121617] dark:text-white mb-2">WhatsApp Integration Paused</h2>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium max-w-md mx-auto mb-8">We're temporarily
-                        bypassing WhatsApp configuration to focus on your email delivery setup. You can restore this
-                        later.</p>
-                    <button @click="activeTab = 'smtp'" class="btn-secondary mx-auto">
-                        Back to SMTP setup
-                    </button>
-                </section>
-            </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn-primary">
+                            <span class="material-symbols-outlined text-[18px]">save</span>
+                            Save WhatsApp Settings
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </x-app-layout>

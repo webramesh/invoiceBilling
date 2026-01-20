@@ -5,12 +5,19 @@
                 {{ __('Invoice') }}: {{ $invoice->invoice_number }}
             </h2>
             <div class="flex">
-                @if($invoice->status !== 'paid')
+                    @if($invoice->status !== 'paid')
                     <form action="{{ route('invoices.mark-as-paid', $invoice) }}" method="POST" class="mr-2">
                         @csrf
                         <x-primary-button class="bg-green-600 hover:bg-green-700 active:bg-green-900 focus:ring-green-500">
                             {{ __('Mark as Paid') }}
                         </x-primary-button>
+                    </form>
+                    <form action="{{ route('invoices.send-whatsapp', $invoice) }}" method="POST" target="_blank" class="mr-2">
+                        @csrf
+                        <x-secondary-button type="submit" formtarget="_blank" class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">chat_bubble</span>
+                            {{ __('WhatsApp') }}
+                        </x-secondary-button>
                     </form>
                 @endif
                 <a href="{{ route('invoices.download', $invoice) }}"

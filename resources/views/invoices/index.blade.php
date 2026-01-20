@@ -109,9 +109,9 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-center gap-2">
-                                        <form action="{{ route('invoices.send-whatsapp', $invoice) }}" method="POST">
+                                        <form action="{{ route('invoices.send-whatsapp', $invoice) }}" method="POST" target="_blank">
                                             @csrf
-                                            <button type="submit" class="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-transform active:scale-95">
+                                            <button type="submit" formtarget="_blank" class="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-transform active:scale-95">
                                                 <span class="material-symbols-outlined text-sm">chat_bubble</span>
                                                 WhatsApp
                                             </button>

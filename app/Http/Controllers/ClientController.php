@@ -100,7 +100,8 @@ class ClientController extends Controller
         $client->load([
             'subscriptions.service',
             'subscriptions.billingCycle',
-            'invoices',
+            'invoices.items',
+            'invoices.payments',
             'notifications' => function ($q) {
                 $q->latest()->limit(5);
             }

@@ -83,6 +83,15 @@
                         @error('phone') <p class="text-red-500 text-[10px] font-bold mt-1 px-1">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    <div class="space-y-2 md:col-span-2">
+                        <label for="address" class="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Address</label>
+                        <textarea id="address" name="address" rows="3"
+                            class="w-full px-4 py-3 bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 rounded-xl text-sm focus:ring-primary focus:border-primary"
+                            placeholder="Street, City, State, ZIP">{{ old('address', $client->address) }}</textarea>
+                        @error('address') <p class="text-red-500 text-[10px] font-bold mt-1 px-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
             </section>
 

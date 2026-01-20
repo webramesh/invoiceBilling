@@ -8,6 +8,7 @@ class Invoice extends Model
 {
     protected $fillable = [
         'invoice_number',
+        'hash',
         'client_id',
         'subscription_id',
         'subtotal',
@@ -24,6 +25,17 @@ class Invoice extends Model
         'issue_date' => 'date',
         'due_date' => 'date',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($invoice) {
+            if (!$invoice->hash) {
+                $invoice->hash = \Illuminate\Support\Str::random(12);
+            }
+        });
+    }
 
     public function client()
     {

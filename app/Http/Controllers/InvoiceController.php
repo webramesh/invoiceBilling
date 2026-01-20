@@ -92,20 +92,30 @@ class InvoiceController extends Controller
         }
     }
 
-    public function sendWhatsApp(Invoice $invoice, \App\Services\WhatsAppService $waService)
+    public function sendWhatsApp(Invoice $invoice)
     {
-        $message = "Hello " . $invoice->client->name . ",\n\n" .
-            "Your invoice #" . $invoice->invoice_number . " for " . ($invoice->subscription->service->name ?? 'Service') . " is ready.\n" .
-            "Amount: Rs. " . number_format($invoice->total, 2) . "\n" .
-            "Due Date: " . \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') . "\n\n" .
-            "Please pay before the due date to avoid service interruption.\n" .
-            "Thank you!";
+        $template = \App\Models\Setting::get('whatsapp_template', "Hello {name},\n\nYour invoice #{invoice_number} for {service_name} is ready.\n\nAmount: Rs. {amount}\nDue Date: {due_date}\n\nView Invoice: {invoice_url}\n\nThank you!");
 
-        if ($waService->sendMessage($invoice->client->whatsapp_number, $message)) {
-            return back()->with('success', 'WhatsApp message sent successfully.');
+        $replacements = [
+            '{name}' => $invoice->client->name,
+            '{invoice_number}' => $invoice->invoice_number,
+            '{service_name}' => $invoice->subscription->service->name ?? 'Service',
+            '{amount}' => number_format($invoice->total, 2),
+            '{due_date}' => $invoice->due_date->format('M d, Y'),
+            '{invoice_url}' => route('invoices.public.show', $invoice->hash),
+        ];
+
+        $message = str_replace(array_keys($replacements), array_values($replacements), $template);
+
+        $phone = preg_replace('/[^0-9]/', '', $invoice->client->whatsapp_number ?? $invoice->client->phone);
+
+        if (empty($phone)) {
+            return back()->with('error', 'Client does not have a WhatsApp number.');
         }
 
-        return back()->with('error', 'Failed to send WhatsApp message. Please check API settings.');
+        $url = "https://wa.me/{$phone}?text=" . urlencode($message);
+
+        return redirect()->away($url);
     }
 
     /**
