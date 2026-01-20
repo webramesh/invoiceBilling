@@ -11,25 +11,26 @@
     }">
         <x-slot name="header">
             <div>
-                <h2 class="text-3xl font-black text-[#121617] dark:text-white tracking-tight">Clients</h2>
+                <h2 class="text-2xl sm:text-3xl font-black text-[#121617] dark:text-white tracking-tight">Clients</h2>
                 <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 font-medium">Manage and monitor customer service
                     accounts</p>
             </div>
         </x-slot>
 
         <!-- Action Bar Below Header -->
-        <div class="mb-6 flex justify-end">
+        <div class="mb-4 sm:mb-6 flex justify-end">
             <a href="{{ route('clients.create') }}"
-                class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg font-bold text-sm hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all active:scale-95">
+                class="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-primary text-white rounded-lg font-bold text-sm hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all active:scale-95">
                 <span class="material-symbols-outlined text-[20px]">person_add</span>
-                Add New Client
+                <span class="hidden sm:inline">Add New Client</span>
+                <span class="sm:hidden">Add Client</span>
             </a>
         </div>
 
         <!-- Dashboard Grid -->
-        <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             <!-- Main Table Section -->
-            <div class="xl:col-span-3 space-y-6">
+            <div class="xl:col-span-3 space-y-4 sm:space-y-6">
                 @if (session('success'))
                     <div
                         class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4 rounded-xl text-green-700 dark:text-green-400 text-sm font-bold flex items-center gap-2">
@@ -42,15 +43,15 @@
                 <div
                     class="bg-white dark:bg-background-dark p-4 rounded-xl border border-gray-200 dark:border-white/10 flex flex-wrap gap-4 items-center">
                     <form action="{{ route('clients.index') }}" method="GET"
-                        class="flex-1 flex flex-wrap gap-4 items-center">
-                        <div class="relative flex-1 min-w-[300px]">
+                        class="flex-1 flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-center">
+                        <div class="relative flex-1 min-w-0 sm:min-w-[300px]">
                             <span
                                 class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
                             <input name="search" value="{{ request('search') }}"
                                 class="w-full pl-11 pr-4 py-2.5 bg-background-light dark:bg-white/5 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm transition-all"
                                 placeholder="Search by name, email, or domain..." type="text" />
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 flex-shrink-0">
                             <select name="status" onchange="this.form.submit()"
                                 class="bg-background-light dark:bg-white/5 border-none rounded-lg text-sm font-semibold focus:ring-2 focus:ring-primary py-2.5 px-4 pr-10 appearance-none">
                                 <option value="">Status: All</option>
@@ -74,49 +75,52 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-gray-100 dark:border-white/10 bg-gray-50/50 dark:bg-white/5">
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Name
+                                    <th class="px-4 sm:px-6 py-3 sm:py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Name
                                     </th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                    <th class="px-4 sm:px-6 py-3 sm:py-4 text-xs font-bold text-gray-400 uppercase tracking-widest hidden md:table-cell">
                                         Email</th>
                                     <th
-                                        class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">
+                                        class="px-4 sm:px-6 py-3 sm:py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center hidden lg:table-cell">
                                         Active Services</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                    <th class="px-4 sm:px-6 py-3 sm:py-4 text-xs font-bold text-gray-400 uppercase tracking-widest hidden lg:table-cell">
                                         Invoiced</th>
                                     <th
-                                        class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">
+                                        class="px-4 sm:px-6 py-3 sm:py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">
                                         Status</th>
                                     <th
-                                        class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">
+                                        class="px-4 sm:px-6 py-3 sm:py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">
                                         Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 dark:divide-white/10">
                                 @forelse ($clients as $client)
                                     <tr class="hover:bg-background-light dark:hover:bg-white/5 transition-colors group">
-                                        <td class="px-6 py-5">
-                                            <span
-                                                class="font-bold text-[#121617] dark:text-white">{{ $client->name }}</span>
+                                        <td class="px-4 sm:px-6 py-4 sm:py-5">
+                                            <div>
+                                                <span class="font-bold text-[#121617] dark:text-white block">{{ $client->name }}</span>
+                                                <span class="text-xs text-gray-500 dark:text-gray-400 md:hidden">{{ $client->email }}</span>
+                                            </div>
                                         </td>
-                                        <td class="px-6 py-5 text-sm text-gray-500 dark:text-gray-400">{{ $client->email }}
+                                        <td class="px-4 sm:px-6 py-4 sm:py-5 text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ $client->email }}
                                         </td>
-                                        <td class="px-6 py-5 text-center">
+                                        <td class="px-4 sm:px-6 py-4 sm:py-5 text-center hidden lg:table-cell">
                                             <div class="flex flex-wrap justify-center gap-1.5">
                                                 <span
-                                                    class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase">
+                                                    class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase whitespace-nowrap">
                                                     {{ $client->subscriptions_count }} ACTIVE
                                                 </span>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-5 font-bold text-[#121617] dark:text-white">Rs.
-                                            {{ number_format($client->invoices_sum_total ?: 0, 2) }}</td>
-                                        <td class="px-6 py-5 text-center">
+                                        <td class="px-4 sm:px-6 py-4 sm:py-5 font-bold text-[#121617] dark:text-white hidden lg:table-cell whitespace-nowrap">Rs.
+                                            {{ number_format($client->invoices_sum_total ?: 0, 2) }}
+                                        </td>
+                                        <td class="px-4 sm:px-6 py-4 sm:py-5 text-center">
                                             <span
-                                                class="inline-flex items-center px-3 py-1 {{ $client->status === 'active' ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-gray-500/10 text-gray-500' }} text-xs font-bold rounded-full uppercase">
+                                                class="inline-flex items-center px-2 sm:px-3 py-1 {{ $client->status === 'active' ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-gray-500/10 text-gray-500' }} text-xs font-bold rounded-full uppercase whitespace-nowrap">
                                                 {{ $client->status }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-5 text-right">
+                                        <td class="px-4 sm:px-6 py-4 sm:py-5 text-right">
                                             <div class="flex justify-end relative" x-data="{ open: false }">
                                                 <button @click="open = !open" @click.away="open = false"
                                                     class="p-2 text-gray-400 hover:text-primary transition-colors focus:outline-none">
@@ -157,7 +161,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="px-6 py-10 text-center text-gray-500 italic">No clients
+                                        <td colspan="6" class="px-4 sm:px-6 py-10 text-center text-gray-500 italic">No clients
                                             found.</td>
                                     </tr>
                                 @endforelse
@@ -167,24 +171,25 @@
                     <!-- Pagination -->
                     @if($clients->hasPages())
                         <div
-                            class="px-6 py-4 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
-                            <p class="text-sm text-gray-500 font-medium">Showing {{ $clients->firstItem() }} to
-                                {{ $clients->lastItem() }} of {{ $clients->total() }} clients</p>
+                            class="px-4 sm:px-6 py-4 border-t border-gray-100 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <p class="text-xs sm:text-sm text-gray-500 font-medium text-center sm:text-left">Showing {{ $clients->firstItem() }} to
+                                {{ $clients->lastItem() }} of {{ $clients->total() }} clients
+                            </p>
                             <div class="flex gap-2">
                                 @if($clients->onFirstPage())
                                     <span
-                                        class="px-4 py-2 bg-background-light dark:bg-white/5 rounded-lg text-sm font-bold opacity-50 cursor-not-allowed text-gray-400">Previous</span>
+                                        class="px-3 sm:px-4 py-2 bg-background-light dark:bg-white/5 rounded-lg text-xs sm:text-sm font-bold opacity-50 cursor-not-allowed text-gray-400">Previous</span>
                                 @else
                                     <a href="{{ $clients->previousPageUrl() }}"
-                                        class="px-4 py-2 bg-background-light dark:bg-white/5 rounded-lg text-sm font-bold hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">Previous</a>
+                                        class="px-3 sm:px-4 py-2 bg-background-light dark:bg-white/5 rounded-lg text-xs sm:text-sm font-bold hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">Previous</a>
                                 @endif
 
                                 @if($clients->hasMorePages())
                                     <a href="{{ $clients->nextPageUrl() }}"
-                                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors">Next</a>
+                                        class="px-3 sm:px-4 py-2 bg-primary text-white rounded-lg text-xs sm:text-sm font-bold shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors">Next</a>
                                 @else
                                     <span
-                                        class="px-4 py-2 bg-primary/50 text-white rounded-lg text-sm font-bold opacity-50 cursor-not-allowed">Next</span>
+                                        class="px-3 sm:px-4 py-2 bg-primary/50 text-white rounded-lg text-xs sm:text-sm font-bold opacity-50 cursor-not-allowed">Next</span>
                                 @endif
                             </div>
                         </div>

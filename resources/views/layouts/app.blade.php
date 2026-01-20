@@ -20,23 +20,41 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Design System Fallback & Configuration (Disabled for Production) -->
-    {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
+    {{--
+    <script src="https://cdn.tailwindcss.com"></script> --}}
 </head>
 
 <body
-    class="bg-background-light dark:bg-background-dark font-display text-[#121617] dark:text-white antialiased min-h-screen">
-    <div class="flex h-full min-h-screen">
+    class="bg-background-light dark:bg-background-dark font-display text-[#121617] dark:text-white antialiased min-h-screen"
+    x-data="{ 
+        sidebarOpen: false, 
+        sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
+        toggleSidebar() {
+            this.sidebarCollapsed = !this.sidebarCollapsed;
+            localStorage.setItem('sidebarCollapsed', this.sidebarCollapsed);
+        }
+    }">
+    <div class="flex h-full min-h-screen relative">
         <!-- Sidebar Navigation -->
         @include('layouts.navigation')
 
         <!-- Main Content Area -->
-        <main class="flex-1 ml-64 min-w-0 flex flex-col">
+        <main x-bind:class="sidebarCollapsed ? 'ml-0 lg:ml-20' : 'ml-0 lg:ml-64'"
+            class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-in-out">
             <!-- Header -->
             <header
-                class="sticky top-0 z-40 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-[#e4e7eb] dark:border-white/10 px-8 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-4">
+                class="sticky top-0 z-40 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-[#e4e7eb] dark:border-white/10 px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+
+                <!-- Mobile Menu Button -->
+                <button @click="sidebarOpen = true"
+                    class="lg:hidden p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-2xl hidden sm:block">
                     <form action="{{ url()->current() }}" method="GET"
-                        class="bg-gray-100 dark:bg-white/5 rounded-lg flex items-center px-3 py-2 w-80">
+                        class="bg-gray-100 dark:bg-white/5 rounded-lg flex items-center px-3 py-2">
                         @foreach(request()->except('search') as $key => $value)
                             <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                         @endforeach
@@ -47,19 +65,29 @@
                     </form>
                 </div>
 
-                <div class="flex items-center gap-4">
+                <!-- Right Side Actions -->
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <!-- Search Icon for Mobile -->
+                    <button
+                        class="sm:hidden p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+
+                    <!-- Notifications -->
                     <button
                         class="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg relative">
                         <span class="material-symbols-outlined">notifications</span>
                         <span
                             class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
                     </button>
-                    <div class="h-8 w-[1px] bg-gray-200 dark:bg-white/10"></div>
 
+                    <div class="h-8 w-[1px] bg-gray-200 dark:bg-white/10 hidden sm:block"></div>
+
+                    <!-- User Menu -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" @click.away="open = false"
                             class="flex items-center gap-3 transition-all focus:outline-none group">
-                            <div class="text-right hidden lg:block">
+                            <div class="text-right hidden xl:block">
                                 <p class="text-sm font-bold leading-none text-[#121617] dark:text-white">
                                     {{ Auth::user()->name }}
                                 </p>
@@ -122,13 +150,13 @@
 
             <!-- Page Title Area (Optional slot for page-specific headers) -->
             @isset($header)
-                <div class="px-8 pt-8">
+                <div class="px-4 sm:px-6 lg:px-8 pt-6 lg:pt-8">
                     {{ $header }}
                 </div>
-            @endisset
+            @endisset>
 
             <!-- Page Content -->
-            <div class="p-8">
+            <div class="p-4 sm:p-6 lg:p-8">
                 {{ $slot }}
             </div>
         </main>
