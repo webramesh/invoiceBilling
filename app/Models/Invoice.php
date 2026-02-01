@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToTenant;
 
 class Invoice extends Model
 {
+    use HasFactory, BelongsToTenant;
+
     protected $fillable = [
+        'user_id',
         'invoice_number',
-        'hash',
         'client_id',
         'subscription_id',
         'subtotal',
@@ -17,25 +21,13 @@ class Invoice extends Model
         'issue_date',
         'due_date',
         'status',
-        'pdf_path',
-        'notes',
+        'hash',
     ];
 
     protected $casts = [
         'issue_date' => 'date',
         'due_date' => 'date',
     ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($invoice) {
-            if (!$invoice->hash) {
-                $invoice->hash = \Illuminate\Support\Str::random(12);
-            }
-        });
-    }
 
     public function client()
     {

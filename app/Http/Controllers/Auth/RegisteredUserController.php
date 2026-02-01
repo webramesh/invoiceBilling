@@ -35,10 +35,14 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $freePlan = \App\Models\SaasPlan::where('slug', 'free')->first();
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'saas_plan_id' => $freePlan?->id,
+            'plan_expires_at' => now()->addDays(30),
         ]);
 
         event(new Registered($user));

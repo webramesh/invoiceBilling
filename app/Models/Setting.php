@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToTenant;
 
 class Setting extends Model
 {
-    protected $fillable = ['key', 'value'];
+    use BelongsToTenant;
+
+    protected $fillable = ['user_id', 'key', 'value'];
 
     public static function get($key, $default = null)
     {

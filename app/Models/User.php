@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'saas_plan_id',
+        'plan_expires_at',
+        'is_admin',
     ];
 
     /**
@@ -43,6 +46,25 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'plan_expires_at' => 'datetime',
+            'is_admin' => 'boolean',
         ];
+    }
+
+    public function saasPlan()
+    {
+        return $this->belongsTo(SaasPlan::class);
+    }
+
+    public function clients()
+    {
+        return $this->hasMany(Client::class);
+    }
+
+    public function isPlanActive()
+    {
+        if ($this->is_admin) return true;
+        if (!$this->plan_expires_at) return false;
+        return $this->plan_expires_at->isFuture();
     }
 }
