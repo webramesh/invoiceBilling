@@ -14,9 +14,9 @@
 <!-- Sidebar -->
 <aside x-bind:class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-64'"
-    class="w-64 {{ request()->routeIs('superadmin.*') ? 'bg-slate-950 shadow-indigo-500/10' : 'bg-primary' }} text-white flex flex-col fixed h-full z-[60] transition-all duration-300 ease-in-out shadow-2xl lg:translate-x-0"
+    class="w-64 bg-primary text-white flex flex-col fixed h-full z-[60] transition-all duration-300 ease-in-out shadow-2xl lg:translate-x-0"
     :style="{ 
-        backgroundColor: '{{ request()->routeIs('superadmin.*') ? '#121617' : '#2492a8' }}',
+        backgroundColor: 'rgb(36,146,168)',
         transform: !sidebarOpen && window.innerWidth < 1024 ? 'translateX(-100%)' : ''
     }">
 
@@ -82,36 +82,93 @@
             </div>
             <div class="h-px bg-white/5 mb-4 mx-2"></div>
         @endif
-        <a href="{{ route('dashboard') }}" 
-            :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
-            class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all {{ request()->routeIs('dashboard') ? 'sidebar-item-active' : 'hover:bg-white/10' }} group relative"
-            x-data="{ tooltip: false }"
-            @mouseenter="tooltip = sidebarCollapsed" 
-            @mouseleave="tooltip = false">
-            <span class="material-symbols-outlined flex-shrink-0 text-xl">dashboard</span>
-            <!-- Desktop: Show/Hide based on collapsed -->
-            <span x-show="!sidebarCollapsed" 
-                x-transition:enter="transition ease-in duration-200 delay-75"
-                x-transition:enter-start="opacity-0 translate-x-2" 
-                x-transition:enter-end="opacity-100 translate-x-0"
-                x-transition:leave="transition ease-out duration-100" 
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="text-sm font-medium whitespace-nowrap hidden lg:block">Dashboard</span>
-            <!-- Mobile: Always show -->
-            <span class="text-sm font-medium whitespace-nowrap lg:hidden">Dashboard</span>
-            <!-- Tooltip -->
-            <div x-show="tooltip && sidebarCollapsed" 
-                x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 translate-x-2" 
-                x-transition:enter-end="opacity-100 translate-x-0"
-                class="hidden lg:block absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg shadow-lg whitespace-nowrap z-50"
-                style="display: none;">
-                Dashboard
-            </div>
-        </a>
 
-        <!-- Clients -->
+        @if(request()->routeIs('superadmin.*'))
+            <!-- SuperAdmin Menu Items -->
+            <a href="{{ route('superadmin.dashboard') }}" 
+                :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all {{ request()->routeIs('superadmin.dashboard') ? 'sidebar-item-active' : 'hover:bg-white/10' }} group relative"
+                x-data="{ tooltip: false }"
+                @mouseenter="tooltip = sidebarCollapsed" 
+                @mouseleave="tooltip = false">
+                <span class="material-symbols-outlined flex-shrink-0 text-xl">dashboard</span>
+                <span x-show="!sidebarCollapsed" 
+                    x-transition:enter="transition ease-in duration-200 delay-75"
+                    x-transition:enter-start="opacity-0 translate-x-2" 
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    x-transition:leave="transition ease-out duration-100" 
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="text-sm font-medium whitespace-nowrap hidden lg:block">Dashboard</span>
+                <span class="text-sm font-medium whitespace-nowrap lg:hidden">Dashboard</span>
+                <div x-show="tooltip && sidebarCollapsed" 
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-x-2" 
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    class="hidden lg:block absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg shadow-lg whitespace-nowrap z-50"
+                    style="display: none;">
+                    Dashboard
+                </div>
+            </a>
+
+            <!-- Business Owners -->
+            <a href="{{ route('superadmin.business-owners.index') }}" 
+                :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all {{ request()->routeIs('superadmin.business-owners.*') ? 'sidebar-item-active' : 'hover:bg-white/10' }} group relative"
+                x-data="{ tooltip: false }"
+                @mouseenter="tooltip = sidebarCollapsed" 
+                @mouseleave="tooltip = false">
+                <span class="material-symbols-outlined flex-shrink-0 text-xl">storefront</span>
+                <span x-show="!sidebarCollapsed" 
+                    x-transition:enter="transition ease-in duration-200 delay-75"
+                    x-transition:enter-start="opacity-0 translate-x-2" 
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    x-transition:leave="transition ease-out duration-100" 
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="text-sm font-medium whitespace-nowrap hidden lg:block">Business Owners</span>
+                <span class="text-sm font-medium whitespace-nowrap lg:hidden">Business Owners</span>
+                <div x-show="tooltip && sidebarCollapsed" 
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-x-2" 
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    class="hidden lg:block absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg shadow-lg whitespace-nowrap z-50"
+                    style="display: none;">
+                    Business Owners
+                </div>
+            </a>
+        @else
+            <!-- Business Owner Menu Items -->
+            <a href="{{ route('dashboard') }}" 
+                :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all {{ request()->routeIs('dashboard') ? 'sidebar-item-active' : 'hover:bg-white/10' }} group relative"
+                x-data="{ tooltip: false }"
+                @mouseenter="tooltip = sidebarCollapsed" 
+                @mouseleave="tooltip = false">
+                <span class="material-symbols-outlined flex-shrink-0 text-xl">dashboard</span>
+                <!-- Desktop: Show/Hide based on collapsed -->
+                <span x-show="!sidebarCollapsed" 
+                    x-transition:enter="transition ease-in duration-200 delay-75"
+                    x-transition:enter-start="opacity-0 translate-x-2" 
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    x-transition:leave="transition ease-out duration-100" 
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="text-sm font-medium whitespace-nowrap hidden lg:block">Dashboard</span>
+                <!-- Mobile: Always show -->
+                <span class="text-sm font-medium whitespace-nowrap lg:hidden">Dashboard</span>
+                <!-- Tooltip -->
+                <div x-show="tooltip && sidebarCollapsed" 
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-x-2" 
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    class="hidden lg:block absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg shadow-lg whitespace-nowrap z-50"
+                    style="display: none;">
+                    Dashboard
+                </div>
+            </a>
+
+            <!-- Clients -->
         <a href="{{ route('clients.index') }}" 
             :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
             class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all {{ request()->routeIs('clients.*') ? 'sidebar-item-active' : 'hover:bg-white/10' }} group relative"
@@ -218,6 +275,8 @@
                 Billing
             </div>
         </a>
+
+        @endif
 
         <!-- System Section Header -->
         <div x-show="!sidebarCollapsed" class="pt-4 pb-2 px-4 hidden lg:block">

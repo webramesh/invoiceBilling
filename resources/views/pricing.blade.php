@@ -7,6 +7,23 @@
     </x-slot>
 
     <div class="py-12">
+        @if(session('success'))
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-6 py-4 rounded-xl flex items-center gap-3">
+                    <span class="material-symbols-outlined text-green-600">check_circle</span>
+                    <span class="font-semibold">{{ session('success') }}</span>
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+                <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-6 py-4 rounded-xl flex items-center gap-3">
+                    <span class="material-symbols-outlined text-red-600">error</span>
+                    <span class="font-semibold">{{ session('error') }}</span>
+                </div>
+            </div>
+        @endif
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 @foreach($plans as $plan)

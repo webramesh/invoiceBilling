@@ -27,6 +27,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // SuperAdmin Routes
     Route::middleware(['superadmin'])->group(function () {
         Route::get('/superadmin', [\App\Http\Controllers\SuperAdmin\DashboardController::class, 'index'])->name('superadmin.dashboard');
+        Route::get('/superadmin/business-owners', [\App\Http\Controllers\SuperAdmin\BusinessOwnerController::class, 'index'])->name('superadmin.business-owners.index');
+        Route::get('/superadmin/business-owners/{businessOwner}', [\App\Http\Controllers\SuperAdmin\BusinessOwnerController::class, 'show'])->name('superadmin.business-owners.show');
     });
 
     Route::get('/pricing', function() {
@@ -34,13 +36,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('pricing');
 
     Route::post('/pricing/subscribe/{plan}', function(\App\Models\SaasPlan $plan, \App\Services\DodoPaymentService $dodo) {
-        $session = $dodo->createCheckoutSession(auth()->user(), $plan);
+        $user = auth()->user();
+        
+        // If it's a free plan (price = 0), assign it directly
+        if ($plan->price == 0) {
+            $user->update([
+                'saas_plan_id' => $plan->id,
+                'plan_expires_at' => now()->addYear(),
+            ]);
+            
+            return redirect()->route('pricing')->with('success', "Successfully subscribed to {$plan->name} plan!");
+        }
+        
+        // For paid plans, create checkout session
+        $session = $dodo->createCheckoutSession($user, $plan);
         
         if ($session && isset($session->checkoutURL)) {
             return redirect()->away($session->checkoutURL);
         }
 
-        return back()->with('error', 'Could not initiate payment. Please try again.');
+        return back()->with('error', 'Could not initiate payment. Please try again or contact support.');
     })->name('pricing.subscribe');
 
     // Webhook - Exclude from CSRF (must handle in VerifyCsrfToken/Middleware)
