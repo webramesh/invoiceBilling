@@ -3,10 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToTenant;
 
 class Subscription extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
+        'user_id',
         'client_id',
         'service_id',
         'billing_cycle_id',

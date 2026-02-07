@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'dodo' => [
+        'api_key' => env('DODO_PAYMENTS_API_KEY'),
+        'environment' => env('DODO_PAYMENTS_ENVIRONMENT', 'test'),
+        'webhook_key' => env('DODO_PAYMENTS_WEBHOOK_KEY'),
+    ],
+
 ];

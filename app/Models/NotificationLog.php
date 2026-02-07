@@ -3,12 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToTenant;
 
 class NotificationLog extends Model
 {
+    use BelongsToTenant;
+
     protected $table = 'notifications';
 
     protected $fillable = [
+        'user_id',
         'client_id',
         'type',
         'channel',

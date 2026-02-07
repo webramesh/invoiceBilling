@@ -1,9 +1,27 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <h2 class="text-3xl font-black text-[#121617] dark:text-white tracking-tight leading-none">Dashboard</h2>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-2 font-medium">Infrastructure overview and business
-                performance</p>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h2 class="text-3xl font-black text-[#121617] dark:text-white tracking-tight leading-none">Dashboard</h2>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mt-2 font-medium">Infrastructure overview and business performance</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 shadow-sm">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Current Plan</p>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-primary dark:text-white">{{ auth()->user()->saasPlan->name ?? 'None' }}</span>
+                        @php
+                            $isExpiringSoon = auth()->user()->plan_expires_at && auth()->user()->plan_expires_at->diffInDays(now()) < 7;
+                        @endphp
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase {{ $isExpiringSoon ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600' }}">
+                            {{ auth()->user()->plan_expires_at ? auth()->user()->plan_expires_at->format('M d') : 'Lifetime' }}
+                        </span>
+                    </div>
+                </div>
+                <a href="{{ route('pricing') }}" class="bg-primary hover:bg-primary-light text-white text-[11px] font-black uppercase tracking-widest px-4 py-2.5 rounded-lg transition-all shadow-md shadow-primary/20">
+                    Upgrade
+                </a>
+            </div>
         </div>
     </x-slot>
 

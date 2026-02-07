@@ -11,7 +11,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'plan.active' => \App\Http\Middleware\CheckPlanActive::class,
+            'superadmin' => \App\Http\Middleware\IsSupperAdmin::class,
+        ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/dodo',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

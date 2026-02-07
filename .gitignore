@@ -25,3 +25,5 @@ whatsapp-service/node_modules
 whatsapp-service/.env
 whatsapp-service/.wwebjs_auth/
 whatsapp-service/.wwebjs_cache/
+WHATSAPP_BRIDGE_DEPLOYMENT.md
+secrets
