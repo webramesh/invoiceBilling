@@ -58,6 +58,14 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
+        // Enforce Plan Limits
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $plan = $user->saasPlan;
+
+        if ($plan && $plan->max_clients != -1 && $user->clients()->count() >= $plan->max_clients) {
+            return back()->with('error', "You have reached the maximum number of clients ({$plan->max_clients}) allowed on your {$plan->name} plan. Please upgrade to add more.");
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:clients,email',

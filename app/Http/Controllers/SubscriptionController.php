@@ -62,8 +62,17 @@ class SubscriptionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, InvoiceService $invoiceService, \App\Services\NotificationService $notificationService)
     {
+        // Enforce Plan Limits for Invoices
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user && $user->saasPlan && $user->saasPlan->max_invoices_per_month != -1) {
+            $currentMonthInvoices = $user->invoices()->whereMonth('created_at', now()->month)->count();
+            if ($currentMonthInvoices >= $user->saasPlan->max_invoices_per_month) {
+                return back()->with('error', "You have reached the monthly invoice limit ({$user->saasPlan->max_invoices_per_month}). Please upgrade to continue.");
+            }
+        }
+
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'service_id' => 'required|exists:services,id',
@@ -80,17 +89,32 @@ class SubscriptionController extends Controller
             if (empty($validated['price']) && $validated['price'] !== '0' && $validated['price'] !== 0) {
                 $validated['price'] = $service->base_price;
             }
-
+            
+            // Set next billing date to start date so the first invoice is generated immediately
+            // The generation service will then advance it by one cycle
             $startDate = Carbon::parse($validated['start_date']);
-            $validated['next_billing_date'] = $startDate->copy()->addMonths($billingCycle->months);
+            $validated['next_billing_date'] = $startDate;
+            
             $validated['status'] = 'active';
             $validated['auto_renewal'] = $request->has('auto_renewal');
             $validated['whatsapp_notifications'] = $request->has('whatsapp_notifications');
             $validated['email_notifications'] = $request->has('email_notifications');
 
-            Subscription::create($validated);
+            $subscription = Subscription::create($validated);
+            
+            // Generate First Invoice
+            $invoice = $invoiceService->generateForSubscription($subscription);
+            
+            // Send Notifications
+            $channels = [];
+            if ($subscription->email_notifications) $channels[] = 'email';
+            if ($subscription->whatsapp_notifications && $user->saasPlan->has_whatsapp) $channels[] = 'whatsapp';
+            
+            if (!empty($channels)) {
+                $notificationService->sendInvoice($invoice, $channels);
+            }
 
-            return redirect()->route('subscriptions.index')->with('success', 'Service assigned to client successfully.');
+            return redirect()->route('subscriptions.index')->with('success', 'Subscription created, invoice generated and sent.');
         } catch (\Exception $e) {
             \Log::error('Subscription creation failed: ' . $e->getMessage());
             return back()->withInput()->with('error', 'Error assigning service: ' . $e->getMessage());
