@@ -4,7 +4,7 @@
 
 @layer base {
     :root {
-        --primary: 36, 146, 168;
+        --primary: var(--color-primary-rgb, 36, 146, 168);
         --danger: 191, 30, 45;
         --background-light: 249, 250, 250;
         --background-dark: 22, 24, 29;

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Bill Easy') }}</title>
+    <title>{{ config('app.name', \App\Models\Setting::get('company_name', 'Bill Easy')) }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -15,6 +15,21 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
+
+    <!-- Tenant Branding -->
+    @php
+        $brandingColor = \App\Models\Setting::get('company_color', '#2492a8');
+    @endphp
+    <style>
+        :root {
+            --color-primary: {{ $brandingColor }};
+            --color-primary-rgb: {{ implode(', ', sscanf($brandingColor, "#%02x%02x%02x")) }};
+        }
+        .bg-primary { background-color: var(--color-primary) !important; }
+        .text-primary { color: var(--color-primary) !important; }
+        .border-primary { border-color: var(--color-primary) !important; }
+        .ring-primary { --tw-ring-color: var(--color-primary) !important; }
+    </style>
 
     <!-- Scripts and Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

@@ -1,4 +1,8 @@
 <!-- Mobile Backdrop -->
+@php
+    $companyName = \App\Models\Setting::get('company_name', 'Bill Easy');
+    $companyLogo = \App\Models\Setting::get('company_logo');
+@endphp
 <div x-show="sidebarOpen" 
     @click="sidebarOpen = false" 
     x-transition:enter="transition-opacity ease-linear duration-300"
@@ -16,17 +20,20 @@
     :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-64'"
     class="w-64 bg-primary text-white flex flex-col fixed h-full z-[60] transition-all duration-300 ease-in-out shadow-2xl lg:translate-x-0"
     :style="{ 
-        backgroundColor: 'rgb(36,146,168)',
         transform: !sidebarOpen && window.innerWidth < 1024 ? 'translateX(-100%)' : ''
     }">
 
     <!-- Header -->
     <div class="p-6 flex items-center justify-between gap-3 relative" :class="sidebarCollapsed ? 'lg:justify-center lg:p-4' : ''">
         <div class="flex items-center gap-3 overflow-hidden" :class="sidebarCollapsed ? 'lg:justify-center' : ''">
-            <div class="bg-white/20 p-2 rounded-lg flex-shrink-0 transition-all" :class="sidebarCollapsed ? 'lg:p-2.5' : ''">
-                <span class="material-symbols-outlined text-white text-2xl" :class="sidebarCollapsed ? 'lg:text-xl' : ''">
-                    {{ request()->routeIs('superadmin.*') ? 'shield_person' : 'rocket_launch' }}
-                </span>
+            <div class="{{ $companyLogo ? 'bg-transparent' : 'bg-white/20' }} p-2 rounded-lg flex-shrink-0 transition-all flex items-center justify-center" :class="sidebarCollapsed ? 'lg:p-2.5' : ''">
+                @if($companyLogo && !request()->routeIs('superadmin.*'))
+                    <img src="{{ Storage::url($companyLogo) }}" alt="Logo" class="h-8 w-auto object-contain" :class="sidebarCollapsed ? 'lg:h-6' : ''">
+                @else
+                    <span class="material-symbols-outlined text-white text-2xl" :class="sidebarCollapsed ? 'lg:text-xl' : ''">
+                        {{ request()->routeIs('superadmin.*') ? 'shield_person' : 'rocket_launch' }}
+                    </span>
+                @endif
             </div>
             <div x-show="!sidebarCollapsed" 
                 x-transition:enter="transition ease-in duration-200 delay-100"
@@ -36,12 +43,12 @@
                 x-transition:leave-start="opacity-100 translate-x-0"
                 x-transition:leave-end="opacity-0 -translate-x-4"
                 class="hidden lg:block">
-                <h1 class="text-lg font-bold leading-none whitespace-nowrap">{{ request()->routeIs('superadmin.*') ? 'Master Hub' : 'Bill Easy' }}</h1>
+                <h1 class="text-sm font-bold leading-none whitespace-normal break-words max-w-[140px]">{{ request()->routeIs('superadmin.*') ? 'Master Hub' : $companyName }}</h1>
                 <p class="text-white/70 text-[10px] uppercase tracking-widest mt-1 whitespace-nowrap">{{ request()->routeIs('superadmin.*') ? 'Platform Admin' : 'Infrastructure' }}</p>
             </div>
             <!-- Mobile: Always show when sidebar is open -->
             <div class="lg:hidden">
-                <h1 class="text-lg font-bold leading-none whitespace-nowrap">{{ request()->routeIs('superadmin.*') ? 'Master Hub' : 'Bill Easy' }}</h1>
+                <h1 class="text-lg font-bold leading-none whitespace-nowrap">{{ request()->routeIs('superadmin.*') ? 'Master Hub' : $companyName }}</h1>
                 <p class="text-white/70 text-[10px] uppercase tracking-widest mt-1 whitespace-nowrap">{{ request()->routeIs('superadmin.*') ? 'Platform Admin' : 'Infrastructure' }}</p>
             </div>
         </div>

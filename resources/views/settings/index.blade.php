@@ -18,6 +18,13 @@
         <div x-data="{ activeTab: 'smtp' }" class="space-y-8">
             <!-- Tabs Navigation -->
             <div class="flex gap-2 p-1.5 bg-gray-100 dark:bg-white/5 rounded-2xl w-fit">
+                <button @click="activeTab = 'branding'"
+                    :class="activeTab === 'branding' ? 'bg-white dark:bg-white/10 text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                    class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg"
+                        :class="activeTab === 'branding' ? 'font-fill' : ''">palette</span>
+                    Branding
+                </button>
                 <button @click="activeTab = 'smtp'"
                     :class="activeTab === 'smtp' ? 'bg-white dark:bg-white/10 text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'"
                     class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
@@ -33,6 +40,68 @@
                     WhatsApp
                 </button>
             </div>
+
+            <!-- Branding Settings Form -->
+            <form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data" x-show="activeTab === 'branding'"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4"
+                x-transition:enter-end="opacity-100 translate-y-0" class="space-y-8">
+                @csrf
+                
+                <div class="grid grid-cols-1 gap-8">
+                    <!-- Brand Identity Card -->
+                    <section class="card-premium">
+                        <div class="card-header">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-primary font-fill text-xl">palette</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-[#121617] dark:text-white">Brand Identity</h3>
+                                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Visual Customization</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                                <div class="form-group">
+                                    <label class="form-label">Company Name</label>
+                                    <input name="company_name" value="{{ $settings['company_name'] ?? '' }}"
+                                        class="form-input" placeholder="My SaaS Company" type="text" />
+                                    <p class="form-help">Appears in the dashboard header and emails.</p>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Primary Color</label>
+                                    <div class="flex items-center gap-3">
+                                        <input name="company_color" value="{{ $settings['company_color'] ?? '#2492a8' }}"
+                                            class="h-10 w-20 rounded cursor-pointer border-0 p-0" type="color" />
+                                        <input type="text" class="form-input flex-1" :value="$el.previousElementSibling.value" readonly> 
+                                    </div>
+                                    <p class="form-help">Main theme color for buttons and sidebar.</p>
+                                </div>
+
+                                <div class="form-group md:col-span-2">
+                                    <label class="form-label">Company Logo</label>
+                                    @if(isset($settings['company_logo']))
+                                        <div class="mb-4 p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-dashed border-gray-200 dark:border-white/10 w-fit">
+                                            <img src="{{ Storage::url($settings['company_logo']) }}" alt="Current Logo" class="h-12 w-auto object-contain">
+                                        </div>
+                                    @endif
+                                    <input name="company_logo" type="file" accept="image/*" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"/>
+                                    <p class="form-help">Upload a PNG or SVG logo (Max 2MB). Recommended height: 40px.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn-primary">
+                            <span class="material-symbols-outlined text-[18px]">save</span>
+                            Save Branding
+                        </button>
+                    </div>
+                </div>
+            </form>
 
             <!-- SMTP Settings Form -->
             <form action="{{ route('settings.update') }}" method="POST" x-show="activeTab === 'smtp'"
