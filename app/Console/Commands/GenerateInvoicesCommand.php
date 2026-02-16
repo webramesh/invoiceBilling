@@ -28,51 +28,23 @@ class GenerateInvoicesCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle(\App\Services\InvoiceService $invoiceService, \App\Services\NotificationService $notificationService)
+    public function handle(\App\Services\InvoiceService $invoiceService)
     {
-        $subscriptions = Subscription::with(['client.user', 'service', 'billingCycle'])
-            ->where('status', 'active')
+        $subscriptions = Subscription::where('status', 'active')
             ->where('next_billing_date', '<=', now()->toDateString())
             ->get();
 
-        $this->info("Found " . $subscriptions->count() . " due subscriptions.");
+        $this->info("Found " . $subscriptions->count() . " due subscriptions. Dispatching jobs...");
 
         foreach ($subscriptions as $subscription) {
-            try {
-                // Get the tenant user who owns this client
-                $user = $subscription->client->user; 
-                
-                // Configure Mail for this tenant
-                if ($user) {
-                    \App\Services\MailConfigService::configureMail($user);
-                }
-
-                // Generate Invoice
-                $invoice = $invoiceService->generateForSubscription($subscription);
-
-                // Send Notifications
-                $channels = [];
-                if ($subscription->email_notifications) {
-                    $channels[] = 'email';
-                }
-                
-                // Check WhatsApp permission and preference
-                // Note: user relationship might be null if client was created without scoped user (shouldn't happen with traits)
-                if ($subscription->whatsapp_notifications && $user && $user->saasPlan && $user->saasPlan->has_whatsapp) {
-                     $channels[] = 'whatsapp';
-                }
-
-                if (!empty($channels)) {
-                    $notificationService->sendInvoice($invoice, $channels);
-                }
-
-                $this->info("Processed subscription #{$subscription->id} for Client: {$subscription->client->name}");
-            } catch (\Exception $e) {
-                $this->error("Failed processing subscription #{$subscription->id}: " . $e->getMessage());
-                \Log::error("Invoice Generation Failed for Subscription #{$subscription->id}: " . $e->getMessage());
-            }
+            // Dispatch the job to the default queue
+            // Laravel handles this synchronously if QUEUE_CONNECTION=sync
+            // Or asynchronously if QUEUE_CONNECTION=database/redis
+            \App\Jobs\ProcessSubscriptionRenewal::dispatch($subscription->id);
+            
+            $this->info("Queued checks for Subscription #{$subscription->id}");
         }
         
-        $this->info("Invoice generation completed.");
+        $this->info("All jobs dispatched.");
     }
 }

@@ -30,8 +30,9 @@ class InvoiceMail extends Mailable
      */
     public function envelope(): Envelope
     {
+        $companyName = \App\Models\Setting::get('company_name', config('app.name'));
         return new Envelope(
-            subject: 'Invoice #' . $this->invoice->invoice_number,
+            subject: 'Invoice #' . $this->invoice->invoice_number . ' from ' . $companyName,
         );
     }
 
