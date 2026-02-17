@@ -1,6 +1,18 @@
 {
+  "node_modules/material-symbols/material-symbols-outlined.woff2": {
+    "file": "assets/material-symbols-outlined-Bgl3Icaq.woff2",
+    "src": "node_modules/material-symbols/material-symbols-outlined.woff2"
+  },
+  "node_modules/material-symbols/material-symbols-rounded.woff2": {
+    "file": "assets/material-symbols-rounded-GzsEeY_J.woff2",
+    "src": "node_modules/material-symbols/material-symbols-rounded.woff2"
+  },
+  "node_modules/material-symbols/material-symbols-sharp.woff2": {
+    "file": "assets/material-symbols-sharp-0IfmRZ0c.woff2",
+    "src": "node_modules/material-symbols/material-symbols-sharp.woff2"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-CvkF4X1s.css",
+    "file": "assets/app-BW3sN1tx.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",

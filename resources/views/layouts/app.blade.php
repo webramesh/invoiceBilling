@@ -9,12 +9,9 @@
     <title>{{ config('app.name', \App\Models\Setting::get('company_name', 'Bill Easy')) }}</title>
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
+    <!-- Fonts -->
+    <link rel="stylesheet" href="{{ asset('assets/geist/geist.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/fontawesome/all.css') }}">
 
     <!-- Tenant Branding -->
     @php

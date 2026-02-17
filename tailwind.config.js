@@ -21,8 +21,8 @@ export default {
                 "accent-red": "#ef4444",
             },
             fontFamily: {
-                sans: ['Manrope', ...defaultTheme.fontFamily.sans],
-                display: ['Manrope', 'sans-serif'],
+                sans: ['Geist', ...defaultTheme.fontFamily.sans],
+                display: ['Geist', 'sans-serif'],
             },
             borderRadius: {
                 "DEFAULT": "0.25rem",
