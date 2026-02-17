@@ -21,6 +21,7 @@ Route::get('/', function () {
 Route::get('i/{hash}', [\App\Http\Controllers\PublicInvoiceController::class, 'show'])->name('invoices.public.show');
 Route::get('i/{hash}/download', [\App\Http\Controllers\PublicInvoiceController::class, 'downloadPdf'])->name('invoices.public.download');
 
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
@@ -75,6 +76,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings/test-email', [SettingController::class, 'testEmail'])->name('settings.test-email');
     });
 });
 

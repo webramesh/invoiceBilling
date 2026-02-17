@@ -15,7 +15,15 @@
             </div>
         @endif
 
-        <div x-data="{ activeTab: 'smtp' }" class="space-y-8">
+        @if(session('error'))
+            <div
+                class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-600 rounded-xl text-sm font-bold flex items-center gap-3">
+                <span class="material-symbols-outlined">error</span>
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <div x-data="{ activeTab: 'smtp', showTestEmailModal: false }" class="space-y-8">
             <!-- Tabs Navigation -->
             <div class="flex gap-2 p-1.5 bg-gray-100 dark:bg-white/5 rounded-2xl w-fit">
                 <button @click="activeTab = 'branding'"
@@ -218,7 +226,7 @@
                                 affect all automation immediately.</p>
                         </div>
                         <div class="flex items-center gap-4 w-full md:w-auto">
-                            <button type="button" class="btn-secondary w-full md:w-auto">
+                            <button type="button" @click="showTestEmailModal = true" class="btn-secondary w-full md:w-auto">
                                 <span class="material-symbols-outlined text-[18px]">send</span>
                                 Send Test
                             </button>
@@ -313,7 +321,7 @@
                             Advanced Bridge Settings (Optional)
                         </button>
 
-                        <div x-show="showAdvanced" x-collapse>
+                        <div x-show="showAdvanced">
                             <section class="card-premium">
                                 <div class="card-body">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -345,6 +353,160 @@
                     </div>
                 </div>
             </form>
+     
+            <!-- Test Email Slide Panel -->
+            <div x-show="showTestEmailModal" 
+                 class="fixed inset-0 z-50 overflow-hidden" 
+                 style="display: none;"
+                 x-data="{ 
+                     testEmail: '', 
+                     sending: false, 
+                     message: '', 
+                     messageType: '',
+                     async sendTestEmail() {
+                         this.sending = true;
+                         this.message = '';
+                         
+                         try {
+                             const formData = new FormData();
+                             formData.append('email', this.testEmail);
+                             formData.append('_token', '{{ csrf_token() }}');
+                             
+                             const response = await fetch('{{ route('settings.test-email') }}', {
+                                 method: 'POST',
+                                 body: formData
+                             });
+                             
+                             const data = await response.text();
+                             
+                             if (response.ok) {
+                                 this.messageType = 'success';
+                                 this.message = 'Test email sent successfully to ' + this.testEmail;
+                                 this.testEmail = '';
+                                 
+                                 // Auto close after 3 seconds
+                                 setTimeout(() => {
+                                     showTestEmailModal = false;
+                                     this.message = '';
+                                 }, 3000);
+                             } else {
+                                 this.messageType = 'error';
+                                 this.message = 'Failed to send test email. Please check your SMTP settings.';
+                             }
+                         } catch (error) {
+                             this.messageType = 'error';
+                             this.message = 'An error occurred: ' + error.message;
+                         } finally {
+                             this.sending = false;
+                         }
+                     }
+                 }">
+                
+                <!-- Backdrop (blurred overlay) -->
+                <div x-show="showTestEmailModal" 
+                     x-transition:enter="transition-opacity ease-out duration-300"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition-opacity ease-in duration-200"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="fixed inset-0 bg-gray-900/30 dark:bg-black/50 backdrop-blur-sm" 
+                     @click="showTestEmailModal = false">
+                </div>
+
+                <!-- Slide Panel -->
+                <div class="fixed inset-y-0 right-0 flex max-w-full pl-10">
+                    <div x-show="showTestEmailModal"
+                         x-transition:enter="transform transition ease-out duration-500"
+                         x-transition:enter-start="translate-x-full opacity-0"
+                         x-transition:enter-end="translate-x-0 opacity-100"
+                         x-transition:leave="transform transition ease-in duration-300"
+                         x-transition:leave-start="translate-x-0 opacity-100"
+                         x-transition:leave-end="translate-x-full opacity-0"
+                         class="w-screen max-w-md">
+                        
+                        <div class="flex h-full flex-col bg-white dark:bg-[#1e2329] shadow-xl">
+                            <!-- Header -->
+                            <div class="bg-primary px-6 py-6">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-white text-xl">send</span>
+                                        </div>
+                                        <h2 class="text-xl font-bold text-white">Send Test Email</h2>
+                                    </div>
+                                    <button @click="showTestEmailModal = false" 
+                                            class="text-white/80 hover:text-white transition-colors">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                                <p class="mt-2 text-sm text-white/80">
+                                    Verify your SMTP configuration by sending a test email
+                                </p>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="flex-1 overflow-y-auto px-6 py-6">
+                                <!-- Success/Error Message -->
+                                <div x-show="message" 
+                                     x-transition
+                                     :class="messageType === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-600' : 'bg-red-500/10 border-red-500/20 text-red-600'"
+                                     class="mb-4 p-4 border rounded-xl text-sm font-bold flex items-center gap-3">
+                                    <span class="material-symbols-outlined" x-text="messageType === 'success' ? 'check_circle' : 'error'"></span>
+                                    <span x-text="message"></span>
+                                </div>
+
+                                <form @submit.prevent="sendTestEmail" class="space-y-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Recipient Email Address</label>
+                                        <input type="email" 
+                                               x-model="testEmail"
+                                               class="form-input w-full" 
+                                               placeholder="you@example.com" 
+                                               required
+                                               :disabled="sending">
+                                        <p class="form-help mt-2">
+                                            Enter the email address where you want to receive the test email
+                                        </p>
+                                    </div>
+
+                                    <!-- Info Box -->
+                                    <div class="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                                        <div class="flex gap-3">
+                                            <span class="material-symbols-outlined text-blue-600 text-xl">info</span>
+                                            <div class="flex-1">
+                                                <h4 class="text-sm font-bold text-blue-600 mb-1">What happens next?</h4>
+                                                <p class="text-xs text-blue-600/80">
+                                                    We'll send a simple test message to verify your SMTP settings are configured correctly. Check your inbox (and spam folder) for the test email.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="border-t border-gray-200 dark:border-white/10 px-6 py-4 bg-gray-50 dark:bg-[#161a1e]">
+                                <div class="flex gap-3">
+                                    <button type="button" 
+                                            @click="showTestEmailModal = false" 
+                                            class="flex-1 btn-secondary">
+                                        Cancel
+                                    </button>
+                                    <button type="button"
+                                            @click="sendTestEmail"
+                                            :disabled="sending || !testEmail"
+                                            class="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <span x-show="!sending" class="material-symbols-outlined text-[18px]">send</span>
+                                        <span x-show="sending" class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
+                                        <span x-text="sending ? 'Sending...' : 'Send'"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </x-app-layout>

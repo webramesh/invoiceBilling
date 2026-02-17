@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class SettingController extends Controller
 {
@@ -59,5 +60,23 @@ class SettingController extends Controller
         }
 
         return back()->with('success', 'Settings updated successfully.');
+    }
+
+    public function testEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        try {
+            Mail::raw('This is a test email from your application setup.', function ($message) use ($request) {
+                $message->to($request->email)
+                    ->subject('Test Email Configuration');
+            });
+
+            return back()->with('success', 'Test email sent successfully to ' . $request->email);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to send test email: ' . $e->getMessage());
+        }
     }
 }
