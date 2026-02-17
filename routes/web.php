@@ -30,6 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/superadmin', [\App\Http\Controllers\SuperAdmin\DashboardController::class, 'index'])->name('superadmin.dashboard');
         Route::get('/superadmin/business-owners', [\App\Http\Controllers\SuperAdmin\BusinessOwnerController::class, 'index'])->name('superadmin.business-owners.index');
         Route::get('/superadmin/business-owners/{businessOwner}', [\App\Http\Controllers\SuperAdmin\BusinessOwnerController::class, 'show'])->name('superadmin.business-owners.show');
+        Route::get('/superadmin/cron-status', [\App\Http\Controllers\SuperAdmin\CronController::class, 'index'])->name('superadmin.cron-status');
     });
 
     Route::get('/pricing', function() {

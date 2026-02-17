@@ -40,8 +40,14 @@ class Client extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    /**
+     * Get all notification logs for this client through subscriptions
+     */
+    /**
+     * Get all notification logs for this client through subscriptions
+     */
     public function notifications()
     {
-        return $this->hasMany(NotificationLog::class);
+        return $this->hasManyThrough(NotificationLog::class, Subscription::class);
     }
 }

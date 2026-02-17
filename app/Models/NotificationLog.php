@@ -9,11 +9,11 @@ class NotificationLog extends Model
 {
     use BelongsToTenant;
 
-    protected $table = 'notifications';
+    protected $table = 'notification_logs';
 
     protected $fillable = [
         'user_id',
-        'client_id',
+        'subscription_id',
         'type',
         'channel',
         'status',
@@ -25,8 +25,13 @@ class NotificationLog extends Model
         'sent_at' => 'datetime',
     ];
 
-    public function client()
+    public function subscription()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(Subscription::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

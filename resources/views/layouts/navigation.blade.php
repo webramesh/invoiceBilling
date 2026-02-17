@@ -144,6 +144,33 @@
                     Business Owners
                 </div>
             </a>
+
+            <!-- Cron Status -->
+            <a href="{{ route('superadmin.cron-status') }}" 
+                :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all {{ request()->routeIs('superadmin.cron-status') ? 'sidebar-item-active' : 'hover:bg-white/10' }} group relative"
+                x-data="{ tooltip: false }"
+                @mouseenter="tooltip = sidebarCollapsed" 
+                @mouseleave="tooltip = false">
+                <span class="material-symbols-outlined flex-shrink-0 text-xl">monitor_heart</span>
+                <span x-show="!sidebarCollapsed" 
+                    x-transition:enter="transition ease-in duration-200 delay-75"
+                    x-transition:enter-start="opacity-0 translate-x-2" 
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    x-transition:leave="transition ease-out duration-100" 
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="text-sm font-medium whitespace-nowrap hidden lg:block">Cron Status</span>
+                <span class="text-sm font-medium whitespace-nowrap lg:hidden">Cron Status</span>
+                <div x-show="tooltip && sidebarCollapsed" 
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-x-2" 
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    class="hidden lg:block absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg shadow-lg whitespace-nowrap z-50"
+                    style="display: none;">
+                    Cron Status
+                </div>
+            </a>
         @else
             <!-- Business Owner Menu Items -->
             <a href="{{ route('dashboard') }}" 

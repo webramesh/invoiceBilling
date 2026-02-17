@@ -24,7 +24,7 @@ trait BelongsToTenant
         // Add a global scope to filter all queries by the authenticated user
         static::addGlobalScope('tenant', function (Builder $builder) {
             if (Auth::check()) {
-                $builder->where('user_id', Auth::id());
+                $builder->where($builder->getModel()->qualifyColumn('user_id'), Auth::id());
             }
         });
     }

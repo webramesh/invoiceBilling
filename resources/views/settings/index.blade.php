@@ -37,7 +37,7 @@
                     :class="activeTab === 'smtp' ? 'bg-white dark:bg-white/10 text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'"
                     class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                     <span class="material-symbols-outlined text-lg"
-                        :class="activeTab === 'smtp' ? 'font-fill' : ''">mail</span>
+                        :class="activeTab === 'smtp' ? 'font-fill' : ''">email</span>
                     SMTP Setup
                 </button>
                 <button @click="activeTab = 'whatsapp'"
@@ -46,6 +46,13 @@
                     <span class="material-symbols-outlined text-lg"
                         :class="activeTab === 'whatsapp' ? 'font-fill' : ''">chat_bubble</span>
                     WhatsApp
+                </button>
+                <button @click="activeTab = 'reminders'"
+                    :class="activeTab === 'reminders' ? 'bg-white dark:bg-white/10 text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                    class="px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg"
+                        :class="activeTab === 'reminders' ? 'font-fill' : ''">notifications</span>
+                    Reminders
                 </button>
             </div>
 
@@ -349,6 +356,165 @@
                         <button type="submit" class="btn-primary">
                             <span class="material-symbols-outlined text-[18px]">save</span>
                             Save WhatsApp Settings
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Reminders Settings Form -->
+            <form action="{{ route('settings.update') }}" method="POST" x-show="activeTab === 'reminders'"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4"
+                x-transition:enter-end="opacity-100 translate-y-0" class="space-y-8">
+                @csrf
+                
+                <div class="grid grid-cols-1 gap-8">
+                    <!-- Schedule Configuration -->
+                    <section class="card-premium">
+                        <div class="card-header">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-primary font-fill text-xl">schedule</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-[#121617] dark:text-white">Reminder Schedule</h3>
+                                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Automated Notifications</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="space-y-6">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Configure when verification emails should be sent to your clients before their invoice is due.</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Reminder 1 -->
+                                    <div class="p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <label class="text-sm font-bold text-gray-700 dark:text-gray-300">1st Reminder</label>
+                                            <label class="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" name="reminder_1_enabled" value="1" class="sr-only peer" {{ ($settings['reminder_1_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
+                                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="number" name="reminder_1_days" value="{{ $settings['reminder_1_days'] ?? 30 }}" 
+                                                class="form-input w-20 text-center" min="1" max="90">
+                                            <span class="text-sm text-gray-500">days before due date</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Reminder 2 -->
+                                    <div class="p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <label class="text-sm font-bold text-gray-700 dark:text-gray-300">2nd Reminder</label>
+                                            <label class="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" name="reminder_2_enabled" value="1" class="sr-only peer" {{ ($settings['reminder_2_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
+                                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="number" name="reminder_2_days" value="{{ $settings['reminder_2_days'] ?? 15 }}" 
+                                                class="form-input w-20 text-center" min="1" max="90">
+                                            <span class="text-sm text-gray-500">days before due date</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Reminder 3 -->
+                                    <div class="p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <label class="text-sm font-bold text-gray-700 dark:text-gray-300">3rd Reminder</label>
+                                            <label class="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" name="reminder_3_enabled" value="1" class="sr-only peer" {{ ($settings['reminder_3_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
+                                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="number" name="reminder_3_days" value="{{ $settings['reminder_3_days'] ?? 5 }}" 
+                                                class="form-input w-20 text-center" min="1" max="90">
+                                            <span class="text-sm text-gray-500">days before due date</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Final Reminder -->
+                                    <div class="p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <label class="text-sm font-bold text-red-600 dark:text-red-400">Final Reminder</label>
+                                            <label class="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" name="reminder_final_enabled" value="1" class="sr-only peer" {{ ($settings['reminder_final_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
+                                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="number" name="reminder_final_days" value="{{ $settings['reminder_final_days'] ?? 1 }}" 
+                                                class="form-input w-20 text-center" min="1" max="90">
+                                            <span class="text-sm text-gray-500">days before due date</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex-1">
+                                            <label class="form-label">Grace Period</label>
+                                            <p class="form-help">Number of days after due date before service is suspended</p>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="number" name="grace_period_days" value="{{ $settings['grace_period_days'] ?? 3 }}" 
+                                                class="form-input w-24 text-center" min="0" max="30">
+                                            <span class="text-sm text-gray-500">days</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Email Templates -->
+                    <section class="card-premium">
+                        <div class="card-header">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-primary font-fill text-xl">edit_document</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-[#121617] dark:text-white">Email Template</h3>
+                                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Custom Message</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="space-y-6">
+                                <div class="form-group">
+                                    <label class="form-label">Email Subject</label>
+                                    <input type="text" name="reminder_email_subject" 
+                                        value="{{ $settings['reminder_email_subject'] ?? 'Upcoming Invoice Reminder - {service_name}' }}" 
+                                        class="form-input">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Email Body</label>
+                                    <textarea name="reminder_email_body" 
+                                        class="form-input min-h-[200px] font-mono text-sm">{{ $settings['reminder_email_body'] ?? "Dear {client_name},\n\nThis is a friendly reminder that your invoice for {service_name} will be due in {days_until_due} days.\n\nInvoice Amount: {amount}\nDue Date: {due_date}\n\nPlease ensure timely payment to avoid any service interruption.\n\nThank you for your business!" }}</textarea>
+                                </div>
+                                
+                                <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-xl">
+                                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Available Placeholders</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <code class="px-2 py-1 bg-white dark:bg-black/20 rounded text-xs text-primary border border-gray-200 dark:border-white/10">{client_name}</code>
+                                        <code class="px-2 py-1 bg-white dark:bg-black/20 rounded text-xs text-primary border border-gray-200 dark:border-white/10">{service_name}</code>
+                                        <code class="px-2 py-1 bg-white dark:bg-black/20 rounded text-xs text-primary border border-gray-200 dark:border-white/10">{amount}</code>
+                                        <code class="px-2 py-1 bg-white dark:bg-black/20 rounded text-xs text-primary border border-gray-200 dark:border-white/10">{due_date}</code>
+                                        <code class="px-2 py-1 bg-white dark:bg-black/20 rounded text-xs text-primary border border-gray-200 dark:border-white/10">{days_until_due}</code>
+                                        <code class="px-2 py-1 bg-white dark:bg-black/20 rounded text-xs text-primary border border-gray-200 dark:border-white/10">{billing_cycle}</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn-primary">
+                            <span class="material-symbols-outlined text-[18px]">save</span>
+                            Save Reminder Settings
                         </button>
                     </div>
                 </div>
