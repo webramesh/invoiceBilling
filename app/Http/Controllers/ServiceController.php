@@ -71,6 +71,7 @@ class ServiceController extends Controller
 
         $validated['is_draft'] = $request->has('is_draft');
         $validated['status'] = $validated['status'] ?? 'active';
+        $validated['tax_rate'] = $validated['tax_rate'] ?? 0;
 
         Service::create($validated);
 
@@ -113,6 +114,7 @@ class ServiceController extends Controller
         ]);
 
         $validated['is_draft'] = $request->has('is_draft');
+        $validated['tax_rate'] = $validated['tax_rate'] ?? 0;
 
         $service->update($validated);
 

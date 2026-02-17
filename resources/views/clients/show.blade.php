@@ -93,7 +93,9 @@
                                 <th class="pb-3 pl-2">Service</th>
                                 <th class="pb-3">Billing Cycle</th>
                                 <th class="pb-3">Next Renewal</th>
-                                <th class="pb-3 text-right pr-2">Price</th>
+                                <th class="pb-3 text-center">Qty</th>
+                                <th class="pb-3 text-right">Unit Price</th>
+                                <th class="pb-3 text-right pr-2">Total</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50 dark:divide-white/5">
@@ -119,7 +121,10 @@
                                             <div>
                                                 <p class="text-sm font-bold text-gray-800 dark:text-gray-200">
                                                     {{ $sub->service->name }}</p>
-                                                <p class="text-[11px] text-gray-400">{{ $sub->status }}</p>
+                                                @if($sub->service_alias)
+                                                    <p class="text-[11px] text-gray-500 font-medium">{{ $sub->service_alias }}</p>
+                                                @endif
+                                                <p class="text-[10px] text-gray-400 mt-0.5 uppercase">{{ $sub->status }}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -131,14 +136,21 @@
                                         <span
                                             class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ $sub->next_billing_date->format('M d, Y') }}</span>
                                     </td>
-                                    <td class="py-4 text-right pr-2">
-                                        <span class="text-sm font-bold text-gray-800 dark:text-gray-200">Rs.
+                                    <td class="py-4 text-center">
+                                        <span class="text-sm font-bold text-gray-800 dark:text-gray-200">{{ $sub->quantity ?? 1 }}</span>
+                                    </td>
+                                    <td class="py-4 text-right">
+                                        <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Rs.
                                             {{ number_format($sub->price, 2) }}</span>
+                                    </td>
+                                    <td class="py-4 text-right pr-2">
+                                        <span class="text-sm font-black text-gray-800 dark:text-gray-200">Rs.
+                                            {{ number_format($sub->price * ($sub->quantity ?? 1), 2) }}</span>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="py-8 text-center text-gray-400 italic text-sm">No active services
+                                    <td colspan="6" class="py-8 text-center text-gray-400 italic text-sm">No active services
                                         assigned yet.</td>
                                 </tr>
                             @endforelse

@@ -14,9 +14,9 @@
             <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-[#dce3e4] dark:border-slate-800 overflow-hidden">
                 <div class="p-8 space-y-8">
                     
-                    <!-- Section: Identity -->
+                <!-- Section: Identity -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
-                        <div class="space-y-2">
+                        <div class="space-y-2 col-span-1 md:col-span-2">
                             <label for="client_id" class="text-xs font-black text-gray-400 uppercase tracking-widest px-1">Select Client</label>
                             <div class="relative">
                                 <select id="client_id" name="client_id" required
@@ -45,12 +45,20 @@
                             </select>
                             @error('service_id') <p class="text-accent-red text-[10px] font-bold mt-1">{{ $message }}</p> @enderror
                         </div>
+
+                        <div class="space-y-2">
+                            <label for="service_alias" class="text-xs font-black text-gray-400 uppercase tracking-widest px-1">Service Alias (Optional)</label>
+                            <input id="service_alias" name="service_alias" value="{{ old('service_alias') }}" type="text"
+                                class="w-full h-12 rounded-xl border border-[#dce3e4] dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-bold" 
+                                placeholder="e.g. Project X, Main Server..."/>
+                            @error('service_alias') <p class="text-accent-red text-[10px] font-bold mt-1">{{ $message }}</p> @enderror
+                        </div>
                     </div>
 
                     <hr class="border-[#f1f3f4] dark:border-slate-800"/>
 
                     <!-- Section: Financials -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-2">
                             <label for="billing_cycle_id" class="text-xs font-black text-gray-400 uppercase tracking-widest px-1">Billing Cycle</label>
                             <select id="billing_cycle_id" name="billing_cycle_id" required
@@ -66,12 +74,20 @@
                         </div>
 
                         <div class="space-y-2">
-                            <label for="price" class="text-xs font-black text-gray-400 uppercase tracking-widest px-1">Custom Amount (Optional)</label>
+                            <label for="quantity" class="text-xs font-black text-gray-400 uppercase tracking-widest px-1">Quantity</label>
+                            <input id="quantity" name="quantity" value="{{ old('quantity', 1) }}" type="number" min="1" step="1"
+                                class="w-full h-12 rounded-xl border border-[#dce3e4] dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-bold" 
+                                placeholder="1"/>
+                            @error('quantity') <p class="text-accent-red text-[10px] font-bold mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="price" class="text-xs font-black text-gray-400 uppercase tracking-widest px-1">Unit Price (Optional)</label>
                             <div class="relative">
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rs.</span>
                                 <input id="price" name="price" value="{{ old('price') }}" type="number" step="0.01"
                                     class="w-full h-12 pl-12 rounded-xl border border-[#dce3e4] dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-bold" 
-                                    placeholder="Leave empty for base price"/>
+                                    placeholder="Base price"/>
                             </div>
                             @error('price') <p class="text-accent-red text-[10px] font-bold mt-1">{{ $message }}</p> @enderror
                         </div>

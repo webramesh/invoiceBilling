@@ -37,7 +37,7 @@ class SubscriptionController extends Controller
         $subscriptions = $query->latest()->paginate(10)->withQueryString();
 
         $stats = [
-            'total_mrr' => Subscription::where('status', 'active')->sum('price'),
+            'total_mrr' => Subscription::where('status', 'active')->sum(\Illuminate\Support\Facades\DB::raw('price * COALESCE(quantity, 1)')),
             'renewals_this_month' => Subscription::whereMonth('next_billing_date', now()->month)->count(),
             'active_services_count' => Subscription::where('status', 'active')->count(),
             'unique_clients_count' => Subscription::distinct('client_id')->count(),
@@ -79,6 +79,8 @@ class SubscriptionController extends Controller
             'billing_cycle_id' => 'required|exists:billing_cycles,id',
             'start_date' => 'required|date',
             'price' => 'nullable|numeric|min:0',
+            'quantity' => 'nullable|integer|min:1',
+            'service_alias' => 'nullable|string|max:255',
             'auto_renewal' => 'nullable',
         ]);
 
@@ -97,6 +99,8 @@ class SubscriptionController extends Controller
             
             $validated['status'] = 'active';
             $validated['auto_renewal'] = $request->has('auto_renewal');
+            $validated['quantity'] = $request->input('quantity', 1);
+            $validated['service_alias'] = $request->input('service_alias');
             $validated['whatsapp_notifications'] = $request->has('whatsapp_notifications');
             $validated['email_notifications'] = $request->has('email_notifications');
 
@@ -154,6 +158,8 @@ class SubscriptionController extends Controller
             'start_date' => 'required|date',
             'next_billing_date' => 'required|date',
             'price' => 'nullable|numeric|min:0',
+            'quantity' => 'nullable|integer|min:1',
+            'service_alias' => 'nullable|string|max:255',
             'status' => 'required|in:active,suspended,cancelled',
         ]);
 
@@ -164,6 +170,8 @@ class SubscriptionController extends Controller
             }
 
             $validated['auto_renewal'] = $request->has('auto_renewal');
+            $validated['quantity'] = $request->input('quantity', 1);
+            $validated['service_alias'] = $request->input('service_alias');
             $validated['whatsapp_notifications'] = $request->has('whatsapp_notifications');
             $validated['email_notifications'] = $request->has('email_notifications');
 

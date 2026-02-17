@@ -165,7 +165,7 @@
                 <div class="px-4 sm:px-6 lg:px-8 pt-6 lg:pt-8">
                     {{ $header }}
                 </div>
-            @endisset>
+            @endisset
 
             <!-- Page Content -->
             <div class="p-4 sm:p-6 lg:p-8">

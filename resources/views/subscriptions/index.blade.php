@@ -139,8 +139,12 @@
                                 <td class="px-6 py-5">
                                     <div class="flex items-center gap-2">
                                         <span class="material-symbols-outlined text-primary text-lg">dns</span>
-                                        <span
-                                            class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ $sub->service->name }}</span>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ $sub->service->name }}</span>
+                                            @if($sub->service_alias)
+                                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tight">{{ $sub->service_alias }}</span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-5">
@@ -159,8 +163,13 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-6 py-5 text-sm font-black text-[#121617] dark:text-white text-right">
-                                    Rs. {{ number_format($sub->price, 2) }}
+                                <td class="px-6 py-5 text-right">
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-sm font-black text-[#121617] dark:text-white">Rs. {{ number_format($sub->price * ($sub->quantity ?? 1), 2) }}</span>
+                                        @if(($sub->quantity ?? 1) > 1)
+                                            <span class="text-[10px] font-bold text-gray-400">Rs. {{ number_format($sub->price, 2) }} &times; {{ $sub->quantity }}</span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-6 py-5 text-center">
                                     <span

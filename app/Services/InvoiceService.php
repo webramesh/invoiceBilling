@@ -21,25 +21,35 @@ class InvoiceService
         return DB::transaction(function () use ($subscription) {
             // Generate unique invoice number
             $invoiceNumber = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+            
+            $quantity = $subscription->quantity ?? 1;
+            $total = $subscription->price * $quantity;
 
             $invoice = Invoice::create([
                 'invoice_number' => $invoiceNumber,
                 'client_id' => $subscription->client_id,
                 'subscription_id' => $subscription->id,
-                'subtotal' => $subscription->price,
+                'subtotal' => $total,
                 'tax' => 0,
-                'total' => $subscription->price,
+                'total' => $total,
                 'issue_date' => now(),
                 'due_date' => now()->addDays(7),
                 'status' => 'unpaid',
             ]);
 
+            // Description with Alias if exists
+            $description = $subscription->service->name;
+            if ($subscription->service_alias) {
+                $description .= ' - ' . $subscription->service_alias;
+            }
+            $description .= ' (' . $subscription->billingCycle->name . ')';
+
             // Create Invoice Item
             $invoice->items()->create([
-                'description' => $subscription->service->name . ' (' . $subscription->billingCycle->name . ')',
-                'quantity' => 1,
+                'description' => $description,
+                'quantity' => $quantity,
                 'unit_price' => $subscription->price,
-                'total' => $subscription->price,
+                'total' => $total,
             ]);
 
             // Update Subscription Next Billing Date

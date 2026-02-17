@@ -27,10 +27,10 @@
             </a>
         </div>
 
-        <!-- Dashboard Grid -->
-        <div class="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+        <!-- Dashboard Content -->
+        <div class="space-y-8">
             <!-- Main Table Section -->
-            <div class="xl:col-span-3 space-y-4 sm:space-y-6">
+            <div class="space-y-4 sm:space-y-6">
                 @if (session('success'))
                     <div
                         class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4 rounded-xl text-green-700 dark:text-green-400 text-sm font-bold flex items-center gap-2">
@@ -121,33 +121,38 @@
                                             </span>
                                         </td>
                                         <td class="px-4 sm:px-6 py-4 sm:py-5 text-right">
-                                            <div class="flex justify-end relative" x-data="{ open: false }">
-                                                <button @click="open = !open" @click.away="open = false"
+                                            <div class="flex justify-end relative" x-data="{ open: false, position: { top: 0, left: 0 } }">
+                                                <button @click="open = !open; let rect = $el.getBoundingClientRect(); position = { top: rect.bottom, left: rect.right - 192 }" 
+                                                    x-ref="button"
                                                     class="p-2 text-gray-400 hover:text-primary transition-colors focus:outline-none">
                                                     <span class="material-symbols-outlined text-[24px]">more_vert</span>
                                                 </button>
 
                                                 <!-- Dropdown Menu -->
-                                                <div x-show="open" x-transition:enter="transition ease-out duration-100"
-                                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                                    x-transition:leave="transition ease-in duration-75"
-                                                    x-transition:leave-start="transform opacity-100 scale-100"
-                                                    x-transition:leave-end="transform opacity-0 scale-95"
-                                                    class="absolute right-0 mt-10 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 z-50 overflow-hidden"
-                                                    style="display: none;">
-                                                    <div class="py-1">
-                                                        <a href="{{ route('clients.show', $client) }}"
-                                                            class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                                                            <span
-                                                                class="material-symbols-outlined text-lg">visibility</span>
-                                                            View Details
-                                                        </a>
-                                                        <a href="{{ route('clients.edit', $client) }}"
-                                                            class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                                                            <span class="material-symbols-outlined text-lg">edit</span> Edit
-                                                            Client
-                                                        </a>
+                                                <template x-teleport="body">
+                                                    <div x-show="open" 
+                                                        @click.outside="if (!$refs.button.contains($event.target)) open = false"
+                                                        x-transition:enter="transition ease-out duration-100"
+                                                        x-transition:enter-start="transform opacity-0 scale-95"
+                                                        x-transition:enter-end="transform opacity-100 scale-100"
+                                                        x-transition:leave="transition ease-in duration-75"
+                                                        x-transition:leave-start="transform opacity-100 scale-100"
+                                                        x-transition:leave-end="transform opacity-0 scale-95"
+                                                        class="fixed w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 z-[9999] overflow-hidden mt-1"
+                                                        :style="'top: ' + position.top + 'px; left: ' + position.left + 'px;'"
+                                                        style="display: none;">
+                                                        <div class="py-1">
+                                                            <a href="{{ route('clients.show', $client) }}"
+                                                                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                                                                <span
+                                                                    class="material-symbols-outlined text-lg">visibility</span>
+                                                                View Details
+                                                            </a>
+                                                            <a href="{{ route('clients.edit', $client) }}"
+                                                                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                                                                <span class="material-symbols-outlined text-lg">edit</span> Edit
+                                                                Client
+                                                            </a>
                                                         <button
                                                             @click="openDeleteModal({{ $client->id }}, '{{ addslashes($client->name) }}'); open = false;"
                                                             class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
@@ -156,6 +161,7 @@
                                                         </button>
                                                     </div>
                                                 </div>
+                                                </template>
                                             </div>
                                         </td>
                                     </tr>
@@ -197,70 +203,69 @@
                 </div>
             </div>
 
-            <!-- Right Sidebar Stats Panel -->
-            <div class="xl:col-span-1 space-y-6">
-                <!-- Stats card contents remains identical -->
+            <!-- Stats Grid at Bottom -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Total Active Clients -->
                 <div class="bg-primary p-6 rounded-2xl shadow-xl shadow-primary/20 relative overflow-hidden group">
-                    <div
-                        class="absolute -right-10 -top-10 size-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700">
-                    </div>
+                    <div class="absolute -right-10 -top-10 size-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700"></div>
                     <div class="relative z-10">
                         <div class="flex items-center justify-between mb-8">
                             <div class="size-10 bg-white/20 rounded-lg flex items-center justify-center">
                                 <span class="material-symbols-outlined text-white">groups_2</span>
                             </div>
-                            <span
-                                class="text-[10px] font-black uppercase text-white/60 tracking-widest bg-white/10 px-2 py-1 rounded">Real-time</span>
+                            <span class="text-[10px] font-black uppercase text-white/60 tracking-widest bg-white/10 px-2 py-1 rounded">Real-time</span>
                         </div>
                         <p class="text-white/80 text-sm font-medium">Total Active Clients</p>
                         <h3 class="text-white text-5xl font-black mt-1">{{ number_format($stats['total_active']) }}</h3>
                         <div class="mt-6 flex items-center gap-2 text-white/90">
                             <span class="material-symbols-outlined text-green-300">trending_up</span>
-                            <span class="text-xs font-bold tracking-tight"><span
-                                    class="text-green-300">+{{ $stats['new_this_month'] }}</span> new this month</span>
+                            <span class="text-xs font-bold tracking-tight"><span class="text-green-300">+{{ $stats['new_this_month'] }}</span> new this month</span>
                         </div>
                     </div>
                 </div>
 
-                <div
-                    class="bg-white dark:bg-background-dark p-6 rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm">
-                    <h4 class="text-[#121617] dark:text-white text-sm font-bold mb-4 uppercase tracking-widest">Growth
-                        Metrics</h4>
-                    <div class="space-y-6">
-                        <div>
-                            <div class="flex justify-between items-end mb-2">
-                                <span class="text-xs font-semibold text-gray-500 uppercase">Retention Rate</span>
-                                <span class="text-xl font-black text-primary">{{ $stats['retention_rate'] }}%</span>
+                <!-- Retention Rate -->
+                <div class="bg-white dark:bg-background-dark p-6 rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="size-10 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center">
+                                <span class="material-symbols-outlined">repeat</span>
                             </div>
-                            <div class="w-full h-1.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
-                                <div class="h-full bg-primary rounded-full"
-                                    style="width: {{ $stats['retention_rate'] }}%"></div>
-                            </div>
+                            <h4 class="text-[#121617] dark:text-white text-sm font-bold uppercase tracking-widest">Retention Rate</h4>
                         </div>
-                        <div>
-                            <div class="flex justify-between items-end mb-2">
-                                <span class="text-xs font-semibold text-gray-500 uppercase">New Acquisitions</span>
-                                <span class="text-xl font-black text-primary">{{ $stats['new_this_month'] }}</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
-                                <div class="h-full bg-primary w-[45%] rounded-full"></div>
-                            </div>
+                        <div class="flex items-end justify-between mb-4">
+                            <h3 class="text-4xl font-black text-[#121617] dark:text-white">{{ $stats['retention_rate'] }}%</h3>
+                            <span class="text-xs font-bold text-green-500 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full mb-1">+2.4%</span>
                         </div>
+                    </div>
+                    <div>
+                        <div class="w-full h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500 rounded-full" style="width: {{ $stats['retention_rate'] }}%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">Percentage of clients who renewed their subscription</p>
                     </div>
                 </div>
 
-                <div
-                    class="p-6 rounded-2xl border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center text-center">
-                    <div
-                        class="size-12 bg-background-light dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined text-gray-400">help_outline</span>
+                <!-- New Acquisitions -->
+                <div class="bg-white dark:bg-background-dark p-6 rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="size-10 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center">
+                            <span class="material-symbols-outlined">person_add</span>
+                            </div>
+                            <h4 class="text-[#121617] dark:text-white text-sm font-bold uppercase tracking-widest">New Acquisitions</h4>
+                        </div>
+                        <div class="flex items-end justify-between mb-4">
+                            <h3 class="text-4xl font-black text-[#121617] dark:text-white">{{ $stats['new_this_month'] }}</h3>
+                            <span class="text-xs font-bold text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-1 rounded-full mb-1">This Month</span>
+                        </div>
                     </div>
-                    <h5 class="text-sm font-bold text-[#121617] dark:text-white">Need help managing clients?</h5>
-                    <p class="text-xs text-gray-500 mt-1 mb-4">Check our knowledge base for platform tutorials and FAQs.
-                    </p>
-                    <a class="text-xs font-bold text-primary hover:underline flex items-center gap-1" href="#">
-                        Visit Help Center <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
-                    </a>
+                    <div>
+                        <div class="w-full h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full bg-purple-500 rounded-full" style="width: 65%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">New clients added in the current month</p>
+                    </div>
                 </div>
             </div>
         </div>

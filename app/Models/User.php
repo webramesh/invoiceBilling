@@ -61,6 +61,11 @@ class User extends Authenticatable
         return $this->hasMany(Client::class);
     }
 
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function isPlanActive()
     {
         if ($this->is_admin) return true;
