@@ -29,6 +29,16 @@ class Invoice extends Model
         'due_date' => 'date',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($invoice) {
+            if (empty($invoice->hash)) {
+                $invoice->hash = \Illuminate\Support\Str::random(32);
+            }
+        });
+    }
+
     public function client()
     {
         return $this->belongsTo(Client::class);
